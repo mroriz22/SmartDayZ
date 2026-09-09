@@ -122,6 +122,7 @@ export function montaMensagem(opts: {
   ];
   if (opts.nome) linhas.push(`Nome: ${opts.nome}`);
   if (opts.email) linhas.push(`E-mail: ${opts.email}`);
+  linhas.push("", "Por favor, não apague as linhas acima. É por elas que a Amelia acha a sua conta na hora, sem ter que perguntar tudo de novo.");
   linhas.push("", "Minha dúvida: ");
   return linhas.join("\n");
 }
