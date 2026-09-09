@@ -20,3 +20,10 @@ export { provisionFromQuack } from "./provision";
 export { RequireAccess } from "./RequireAccess";
 export { PaywallScreen } from "./PaywallScreen";
 export { useAccess, trackClient } from "./useAccess";
+export {
+  SuporteWhatsApp,
+  montaMensagem,
+  linkSuporte,
+  SUPORTE_WHATSAPP,
+  SUPORTE_NOME,
+} from "./SuporteWhatsApp";

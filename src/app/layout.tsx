@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
+import { SuporteWhatsApp } from "@/factory/SuporteWhatsApp";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -23,7 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${manrope.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <SuporteWhatsApp produto={appName} />
+      </body>
     </html>
   );
 }
