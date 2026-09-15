@@ -12,18 +12,18 @@ type Sdk = {
 
 /**
  * As telas de venda que quem chega do anuncio ve antes da pagina.
- * O texto vive no control (control.roriz.tech/saas/smartdayz/onboarding),
+ * O texto vive no control (lab2appz.roriz.tech/onboarding/saas/smartdayz/onboarding),
  * entao mudar copy nao passa por deploy daqui.
  */
 export function OnboardingVenda({ destino = "/login" }: { destino?: string }) {
   useEffect(() => {
     const css = document.createElement("link");
     css.rel = "stylesheet";
-    css.href = "https://control.roriz.tech/sdk/onboarding.css";
+    css.href = "https://lab2appz.roriz.tech/onboarding/sdk/onboarding.css";
     document.head.appendChild(css);
 
     const js = document.createElement("script");
-    js.src = "https://control.roriz.tech/sdk/onboarding.js";
+    js.src = "https://lab2appz.roriz.tech/onboarding/sdk/onboarding.js";
     js.async = true;
     js.onload = () => {
       const sdk = (window as unknown as { OnboardingVenda?: Sdk }).OnboardingVenda;
