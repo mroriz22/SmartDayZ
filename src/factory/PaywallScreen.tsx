@@ -29,7 +29,7 @@ export function PaywallScreen({ access, userId }: Props) {
         <p className="text-zinc-600 dark:text-zinc-400">
           {access?.status === "trial"
             ? "Seu teste está ativo. Se esta tela apareceu, recarregue a página."
-            : "Assine para continuar com o produto completo."}
+            : "Assine o Pro por R$29,90/mês para continuar com o produto completo."}
         </p>
       </div>
 
