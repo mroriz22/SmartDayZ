@@ -203,7 +203,7 @@ export function QuizFlow() {
             <li>Aviso no pico do app (ainda 15h às 22h), sem prometer ritmo personalizado.</li>
           </ul>
           <div className="rounded-[16px] border border-hairline bg-pebble px-5 py-4 text-sm leading-relaxed text-slate">
-            7 dias com tudo liberado, sem cartão. Depois Pro R$29,90/mês.
+            7 dias com tudo liberado, sem cartão. Depois Pro R$14,90/mês.
           </div>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <Link

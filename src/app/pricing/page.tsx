@@ -33,10 +33,10 @@ export default function PricingPage() {
       <div className="rounded-card border border-hairline p-6">
         <h2 className="text-lg font-semibold">SmartDayZ Pro</h2>
         <p className="mt-2 text-3xl font-semibold tracking-tight text-ink">
-          R$29,90<span className="text-base font-medium text-slate">/mês</span>
+          R$14,90<span className="text-base font-medium text-slate">/mês</span>
         </p>
         <p className="mt-1 text-sm text-slate">
-          Grátis por {factoryConfig.trialDays} dias, sem cartão. Depois R$29,90/mês.
+          Grátis por {factoryConfig.trialDays} dias, sem cartão. Depois R$14,90/mês.
         </p>
 
         <ul className="mt-5 space-y-2.5">
