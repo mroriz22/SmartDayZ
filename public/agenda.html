@@ -1923,7 +1923,7 @@
     $("#pwNoPro").style.display = (logged && !pro) ? "" : "none";
     $("#pwActive").style.display = (logged && pro) ? "" : "none";
     if (logged) {
-      $("#pwUserEmail").textContent = authUser.email; $("#pwUserEmail2").textContent = authUser.email;
+      $("#pwUserEmail").textContent = authUser.email;
       const left = trialDaysLeft();
       const url = checkoutUrl();
       $("#pwSubscribe").style.display = url ? "" : "none";
