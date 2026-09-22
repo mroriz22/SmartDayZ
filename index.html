@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SmartDayZ | Agenda inteligente de prioridades</title>
-<meta name="description" content="Agenda grátis com Matriz de Eisenhower e pico de energia: marque urgência e importância e o SmartDayZ encaixa o trabalho importante no horário em que você rende mais.">
+<!--b:titulo--><title>SmartDayZ | O importante, na sua melhor hora.</title><!--/b-->
+<meta name="description" content="Agenda grátis com Matriz de Eisenhower e pico de energia. Marque o que é urgente e o que é importante: o importante vai para a hora em que você rende, até três por dia.">
 <link rel="canonical" href="https://smartdayz.com/">
 <meta name="theme-color" content="#F7F8FA">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SmartDayZ">
-<meta property="og:title" content="SmartDayZ | Seu dia, com direção.">
+<meta property="og:title" content="O importante, na sua melhor hora." data-b-content="assinatura">
 <meta property="og:description" content="Agenda grátis com Matriz de Eisenhower e pico de energia. Sem cadastro, sem cartão.">
 <meta property="og:url" content="https://smartdayz.com/">
 <meta property="og:image" content="https://smartdayz.com/assets/logo.png">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="SmartDayZ | Seu dia, com direção.">
+<meta name="twitter:title" content="O importante, na sua melhor hora." data-b-content="assinatura">
 <meta name="twitter:description" content="Agenda grátis com Matriz de Eisenhower e pico de energia. Sem cadastro, sem cartão.">
 <link rel="icon" href="icon.ico" sizes="any">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/logo.png">
 <script>
   // Quem já usa o app (dados no navegador, sessão ou link antigo com ?pro=) vai direto pro /app/.
@@ -49,169 +48,176 @@
     } catch (e) {}
   })();
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/fonts/Inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<!--b:schema--><script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "SmartDayZ", "applicationCategory": "BusinessApplication", "operatingSystem": "Web", "description": "O importante, na sua melhor hora.", "offers": [{"@type": "Offer", "name": "Gratuito", "price": "0", "priceCurrency": "BRL"}, {"@type": "Offer", "name": "Pro mensal", "price": "14.90", "priceCurrency": "BRL"}, {"@type": "Offer", "name": "Pro anual", "price": "119.00", "priceCurrency": "BRL"}]}</script><!--/b-->
 <style>
-  :root {
-    --bg: #F7F8FA; --surface: #FFFFFF; --fg: #0B1A3F; --muted: #EEF1F5; --muted-fg: #475569;
-    --border: #E2E6EC; --border-strong: #C9D0DA; --primary: #FB7915; --navy: #0B1A3F;
-    --on-navy: #F7F8FA; --on-navy-soft: #B8C2D6; --on-navy-text: #E3E8F0;
-  }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-  a { color: var(--fg); text-decoration: none; }
-  a:hover { color: var(--primary); }
+  html, body { margin: 0; padding: 0; background: var(--c-background); color: var(--c-text); font-family: var(--font-sans); font-size: 16px; line-height: var(--lh-body); -webkit-font-smoothing: antialiased; }
+  a { color: var(--c-text); text-decoration: none; }
+  a:hover { color: var(--c-accent-ink); }
   h1, h2, h3, p { margin: 0; }
   img { max-width: 100%; }
+  :focus-visible { outline: 2px solid var(--c-focus-ring); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } html { scroll-behavior: auto; } }
 
-  .container { max-width: 1120px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
-  .band { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--primary); }
+  .container { max-width: 1120px; margin: 0 auto; padding-left: var(--sp-5); padding-right: var(--sp-5); }
+  .band { background: var(--c-surface); border-top: 1px solid var(--c-divider); border-bottom: 1px solid var(--c-divider); }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--c-accent-ink); }
   .h2 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
-  .lead { font-size: 17px; color: var(--muted-fg); text-wrap: pretty; }
-  .sec-head { max-width: 620px; display: flex; flex-direction: column; gap: 12px; }
+  .lead { font-size: 17px; color: var(--c-secondary); text-wrap: pretty; }
+  .sec-head { max-width: 620px; display: flex; flex-direction: column; gap: var(--sp-3); }
+  .num { font-variant-numeric: tabular-nums; }
 
-  /* ---------- botões (IronStack Button) ---------- */
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 500; height: 36px; padding: 0 16px; cursor: pointer; border: 1px solid transparent; background: var(--primary); color: var(--fg); box-shadow: 0 1px 2px rgba(11,26,63,.06); transition: color .15s, background-color .15s, border-color .15s, box-shadow .15s, transform .15s; }
-  .btn:hover { background: rgba(251,121,21,.9); color: var(--fg); }
+  /* ---------- botões: primário laranja com texto marinho (6,36:1); nunca texto branco ---------- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); white-space: nowrap; border-radius: var(--r-control); font: inherit; font-size: 14px; font-weight: 600; min-height: var(--touch-min); padding: 0 var(--sp-5); cursor: pointer; border: 1px solid transparent; background: var(--c-action); color: var(--c-action-text); box-shadow: var(--shadow-card); transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease); }
+  .btn:hover { color: var(--c-action-text); filter: brightness(0.96); }
   .btn:active { transform: scale(.97); }
-  .btn:focus-visible { outline: none; box-shadow: 0 0 0 1px var(--bg), 0 0 0 3px var(--primary); }
-  .btn.sm { height: 32px; padding: 0 12px; font-size: 12px; }
-  .btn.lg { height: 40px; padding: 0 24px; }
+  .btn.sm { min-height: 36px; padding: 0 var(--sp-3); font-size: 13px; }
   .btn.block { width: 100%; }
-  .btn.outline { background: transparent; border-color: var(--border-strong); box-shadow: none; }
-  .btn.outline:hover { background: var(--muted); }
-  .btn.ghost { background: transparent; color: var(--muted-fg); box-shadow: none; }
-  .btn.ghost:hover { background: var(--muted); color: var(--fg); }
-  .badge-outline { display: inline-flex; align-items: center; gap: 4px; border-radius: 8px; border: 1px solid var(--border-strong); padding: 2px 8px; font-size: 12px; font-weight: 500; color: var(--fg); }
+  .btn.outline { background: transparent; border-color: var(--c-control-border); color: var(--c-text); box-shadow: none; }
+  .btn.outline:hover { background: var(--c-surface-alt); filter: none; }
+  .btn.ghost { background: transparent; color: var(--c-secondary); box-shadow: none; }
+  .btn.ghost:hover { background: var(--c-surface-alt); color: var(--c-text); filter: none; }
+  .btn.secondary { background: var(--c-action-secondary); color: var(--c-action-secondary-text); }
+  .btn.secondary:hover { color: var(--c-action-secondary-text); }
+  .badge-outline { display: inline-flex; align-items: center; gap: var(--sp-1); border-radius: var(--r-control); border: 1px solid var(--c-control-border); padding: 2px var(--sp-2); font-size: 12px; font-weight: 500; color: var(--c-text); }
+
+  /* ---------- badges de estado: sempre com o nome escrito ---------- */
+  .q { font-size: 11px; font-weight: 700; padding: 2px var(--sp-2); border-radius: var(--r-pill); white-space: nowrap; }
+  .q-fazer { background: var(--s-fazer-agora-surface); color: var(--s-fazer-agora-text); }
+  .q-foco { background: var(--s-foco-surface); color: var(--s-foco-text); }
+  .q-delegar { background: var(--s-delegar-surface); color: var(--s-delegar-text); }
+  .q-eliminar { background: var(--s-eliminar-surface); color: var(--s-eliminar-text); }
 
   /* ---------- header ---------- */
-  .site-header { position: sticky; top: 0; z-index: 20; background: rgba(247,248,250,.92); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
-  .site-header .container { padding-top: 12px; padding-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .site-header { position: sticky; top: 0; z-index: 20; background: var(--c-background); border-bottom: 1px solid var(--c-divider); }
+  .site-header .container { padding-top: var(--sp-3); padding-bottom: var(--sp-3); display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
   .brand { display: flex; align-items: center; gap: 10px; }
   .brand img { width: 32px; height: 32px; display: block; }
   .brand span { font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
-  .site-nav { display: flex; align-items: center; gap: 24px; font-size: 14px; font-weight: 500; }
-  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .site-nav { display: flex; align-items: center; gap: var(--sp-5); font-size: 14px; font-weight: 500; }
+  .header-actions { display: flex; gap: var(--sp-2); align-items: center; }
   .cta-short { display: none; }
   @media (max-width: 760px) { .site-nav { display: none; } }
   @media (max-width: 420px) { .cta-long { display: none; } .cta-short { display: inline; } .brand span { font-size: 16px; } }
 
   /* ---------- hero ---------- */
-  .hero { padding-top: 88px; padding-bottom: 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: center; }
-  .hero-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 24px; max-width: 560px; }
-  .hero h1 { font-size: clamp(40px, 6vw, 64px); line-height: 1.05; font-weight: 700; letter-spacing: -0.03em; text-wrap: balance; }
-  .hero h1 em { font-style: normal; color: var(--primary); }
-  .hero-sub { font-size: 19px; line-height: 1.55; color: var(--muted-fg); text-wrap: pretty; max-width: 480px; }
-  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-  .free-note { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--fg); }
+  .hero { padding-top: 88px; padding-bottom: var(--sp-8); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--sp-7); align-items: center; }
+  @media (max-width: 640px) { .hero { padding-top: var(--sp-6); gap: var(--sp-6); } }
+  .hero-copy { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-5); max-width: 560px; }
+  .hero h1 { font-size: clamp(38px, 6vw, 64px); line-height: 1.05; font-weight: 700; letter-spacing: -0.03em; text-wrap: balance; }
+  .hero-sub { font-size: 19px; line-height: 1.55; color: var(--c-secondary); text-wrap: pretty; max-width: 480px; }
+  @media (max-width: 640px) { .hero-sub { font-size: 17px; } .hero-copy { gap: var(--sp-4); } }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+  .free-note { display: flex; align-items: center; gap: var(--sp-2); font-size: 14px; font-weight: 500; }
   .free-note b { font-weight: 700; }
-  .free-note .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--primary); flex-shrink: 0; }
-  .hero-media { position: relative; width: 100%; aspect-ratio: 4 / 5; max-height: 640px; border-radius: 20px; overflow: hidden; box-shadow: 0 28px 60px -16px rgba(11,26,63,.35); background: #dfe3ea; }
-  .hero-media img.photo { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .photo-credit { position: absolute; top: 12px; left: 12px; font-size: 11px; color: #fff; background: rgba(11,26,63,.45); padding: 2px 8px; border-radius: 999px; }
-  .photo-credit:hover { color: #fff; text-decoration: underline; }
-  .day-card { position: absolute; left: 16px; right: 16px; bottom: 16px; background: var(--navy); color: var(--on-navy); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 16px 40px -12px rgba(11,26,63,.5); }
-  .day-card-top { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-  .label-navy { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--primary); }
-  .pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--primary); color: var(--navy); white-space: nowrap; }
-  .pill.soft { background: rgba(255,255,255,.14); color: var(--on-navy); }
-  .slot-row { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; }
-  .slot-row time { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--primary); }
-  .slot-row time.off { color: var(--on-navy-soft); }
-  .slot { border-radius: 8px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; background: var(--primary); color: var(--navy); }
-  .slot.off { background: rgba(255,255,255,.08); color: var(--on-navy); border: 1px solid rgba(255,255,255,.14); }
-  .slot .pill { background: var(--navy); color: var(--on-navy); }
-  .slot.off .pill { background: rgba(255,255,255,.14); }
-  .day-card p { font-size: 13px; line-height: 1.5; color: var(--on-navy-text); }
+  .free-note .dot { width: 8px; height: 8px; border-radius: var(--r-pill); background: var(--c-action); flex-shrink: 0; }
 
-  /* ---------- demo ---------- */
+  /* o próprio dia montado no lugar da foto (a foto de desespero saiu: contradiz "sem culpa") */
+  .day-card { background: var(--c-surface); border: 1px solid var(--c-divider); border-radius: 20px; box-shadow: var(--shadow-sheet); padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-3); }
+  .day-top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-2); font-size: 14px; }
+  .day-top b { font-weight: 700; }
+  .day-top span { color: var(--c-secondary); }
+  .slot { display: grid; grid-template-columns: 48px 1fr; gap: var(--sp-3); align-items: center; }
+  .slot time { font-size: 13px; font-weight: 600; color: var(--c-secondary); font-variant-numeric: tabular-nums; }
+  .slot .it { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-2); border: 1px solid var(--c-divider); background: var(--c-surface); border-radius: var(--r-card); padding: 10px var(--sp-3); font-size: 14px; font-weight: 600; min-width: 0; }
+  .peak-band { background: var(--s-pico-surface); border-radius: var(--r-card); padding: var(--sp-3); display: flex; flex-direction: column; gap: var(--sp-2); }
+  .peak-band .pb-head { display: flex; justify-content: space-between; gap: var(--sp-2); font-size: 12px; font-weight: 700; color: var(--s-pico-text); }
+  .peak-band .slot time { color: var(--s-pico-text); }
+  .slot .it.free { border-style: dashed; border-color: var(--c-control-border); background: transparent; color: var(--c-secondary); font-weight: 500; }
+  @media (max-width: 420px) { .day-card { padding: var(--sp-4); } .slot { grid-template-columns: 42px 1fr; gap: var(--sp-2); } .peak-band { padding: var(--sp-2); } }
+  .rule { border-top: 1px solid var(--c-divider); padding-top: var(--sp-3); display: flex; flex-direction: column; gap: var(--sp-1); }
+  .rule .lbl { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--c-accent-ink); }
+  .rule p { font-size: 14px; color: var(--c-text); }
+
+  /* ---------- como funciona ---------- */
   .demo { padding-top: 80px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 40px; }
-  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; align-items: start; }
-  .demo-input { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
-  .step-label { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-fg); }
-  .task-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 4px; }
+  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--sp-5); align-items: start; }
+  .demo-input { background: var(--c-background); border: 1px solid var(--c-divider); border-radius: var(--r-sheet); padding: var(--sp-5); display: flex; flex-direction: column; gap: 20px; }
+  .step-label { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--c-secondary); }
+  .task-card { background: var(--c-surface); border: 1px solid var(--c-divider); border-radius: var(--r-card); padding: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-1); }
   .task-card b { font-size: 17px; font-weight: 600; }
-  .task-card span { font-size: 13px; color: var(--muted-fg); }
+  .task-card span { font-size: 13px; color: var(--c-secondary); }
   .toggles { display: flex; flex-direction: column; gap: 10px; }
-  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--fg); font: inherit; cursor: pointer; text-align: left; min-height: 52px; width: 100%; transition: border-color .15s; }
-  .toggle:hover { border-color: var(--border-strong); }
-  .toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: 14px var(--sp-4); border-radius: var(--r-card); border: 1px solid var(--c-control-border); background: var(--c-surface); color: var(--c-text); font: inherit; cursor: pointer; text-align: left; min-height: 52px; width: 100%; }
   .toggle .tt { display: flex; flex-direction: column; gap: 2px; }
   .toggle .tt b { font-weight: 600; font-size: 15px; }
-  .toggle .tt span { font-size: 13px; color: var(--muted-fg); }
-  .yn { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--muted); color: var(--fg); white-space: nowrap; }
-  .demo-out { display: flex; flex-direction: column; gap: 16px; }
+  .toggle .tt span { font-size: 13px; color: var(--c-secondary); }
+  .yn { font-size: 12px; font-weight: 700; padding: var(--sp-1) 10px; border-radius: var(--r-pill); background: var(--c-surface-alt); color: var(--c-text); white-space: nowrap; }
+  .toggle[aria-pressed="true"] { border: 2px solid var(--c-text); padding: 13px 15px; background: var(--s-pico-surface); }
+  .demo-out { display: flex; flex-direction: column; gap: var(--sp-4); }
   .quads { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .quad { border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-height: 120px; display: flex; flex-direction: column; gap: 6px; background: var(--bg); }
-  .quad b { font-size: 14px; font-weight: 700; }
-  .quad > span { font-size: 12px; color: var(--muted-fg); }
-  .quad .chip { margin-top: auto; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 8px; background: var(--primary); color: var(--navy); display: none; }
-  .quad.on .chip { display: block; }
-  .rule-card { background: var(--navy); color: var(--on-navy); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; }
+  .quad { border: 1px solid var(--c-divider); border-radius: var(--r-card); padding: var(--sp-4); min-height: 120px; display: flex; flex-direction: column; gap: 6px; background: var(--c-background); }
+  .quad .q { align-self: flex-start; font-size: 12px; }
+  .quad > span.sub { font-size: 12px; color: var(--c-secondary); }
+  .quad .chip { margin-top: auto; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: var(--r-control); background: var(--c-action); color: var(--c-action-text); }
+  .quad:not(.on) .chip { display: none; }
+  .rule-card { background: var(--c-background); color: var(--c-text); border-radius: var(--r-card); padding: var(--sp-4) 18px; display: flex; flex-direction: column; gap: 6px; }
+  .rule-card .lbl { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--c-accent-ink); }
   .rule-card p { font-size: 14px; line-height: 1.5; }
-  .rule-card small { font-size: 12px; color: var(--on-navy-soft); }
 
   /* ---------- recursos ---------- */
   .features { padding-top: 80px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 40px; }
   .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-  .feature { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 14px; }
-  .feature .ic { width: 40px; height: 40px; border-radius: 10px; background: var(--muted); display: flex; align-items: center; justify-content: center; }
-  .feature h3 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  .feature p { font-size: 15px; color: var(--muted-fg); text-wrap: pretty; }
-  .pro-tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; background: var(--navy); color: var(--on-navy); }
+  .feature { background: var(--c-surface); border: 1px solid var(--c-divider); border-radius: var(--r-sheet); padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+  .feature .ic { width: 40px; height: 40px; border-radius: 10px; background: var(--c-surface-alt); color: var(--c-text); display: flex; align-items: center; justify-content: center; }
+  .feature h3 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: var(--sp-2); }
+  .feature p { font-size: 15px; color: var(--c-secondary); text-wrap: pretty; }
+  .pro-tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 2px var(--sp-2); border-radius: var(--r-pill); background: var(--c-action-secondary); color: var(--c-action-secondary-text); }
 
   /* ---------- planos ---------- */
   .pricing { padding-top: 80px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 40px; }
   .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 820px; align-items: stretch; }
-  .plan { border-radius: 16px; padding: 32px; display: flex; flex-direction: column; gap: 20px; }
-  .plan.free { background: var(--surface); border: 2px solid var(--primary); box-shadow: 0 16px 40px -12px rgba(11,26,63,.16); position: relative; }
-  .plan.pro { background: var(--navy); color: var(--on-navy); }
-  .plan-ribbon { position: absolute; top: -13px; left: 24px; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--primary); color: var(--navy); }
+  .plan { border-radius: var(--r-sheet); padding: var(--sp-6); display: flex; flex-direction: column; gap: 20px; }
+  .plan.free { background: var(--c-surface); border: 2px solid var(--c-text); box-shadow: var(--shadow-sheet); position: relative; }
+  .plan.pro { background: var(--c-background); color: var(--c-text); }
+  .plan-ribbon { position: absolute; top: -13px; left: var(--sp-5); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: var(--r-pill); background: var(--c-action); color: var(--c-action-text); }
   .plan-head { display: flex; flex-direction: column; gap: 6px; }
-  .plan-name { font-size: 14px; font-weight: 600; color: var(--muted-fg); }
-  .plan.pro .plan-name { color: var(--primary); }
+  .plan-name { font-size: 14px; font-weight: 600; color: var(--c-secondary); }
+  .plan.pro .plan-name { color: var(--c-accent-ink); }
   .price { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.2; }
-  .price small { font-size: 16px; font-weight: 500; color: var(--on-navy-soft); letter-spacing: 0; }
-  .plan-note { font-size: 14px; color: var(--muted-fg); }
-  .plan.free .plan-note { color: var(--fg); font-weight: 600; }
-  .plan.pro .plan-note { color: var(--on-navy-soft); }
+  .price small { font-size: 16px; font-weight: 500; letter-spacing: 0; }
+  .plan.pro .price small, .plan.pro .plan-note, .plan.pro .plan-foot { color: var(--c-secondary); }
+  .plan-note { font-size: 14px; color: var(--c-secondary); }
+  .plan.free .plan-note { color: var(--c-text); font-weight: 600; }
   .checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 15px; flex: 1; }
   .checks li { display: flex; gap: 10px; align-items: flex-start; }
-  .checks li::before { content: "✓"; color: var(--primary); font-weight: 700; }
-  .plan.pro .btn { margin-top: auto; }
+  .checks li::before { content: "✓"; font-weight: 700; color: var(--c-accent-ink); }
+  .plan-foot { font-size: 13px; }
 
-  /* ---------- faq ---------- */
-  .faq { max-width: 760px; margin: 0 auto; padding: 80px 24px; display: flex; flex-direction: column; gap: 32px; }
-  .faq-list { display: flex; flex-direction: column; border-top: 1px solid var(--border); }
-  .faq-item { border-bottom: 1px solid var(--border); }
-  .faq-q { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 0; background: none; border: 0; font: inherit; color: var(--fg); font-size: 17px; font-weight: 600; text-align: left; cursor: pointer; min-height: 56px; }
-  .faq-q:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-  .faq-q i { font-style: normal; font-size: 22px; color: var(--primary); line-height: 1; flex-shrink: 0; }
-  .faq-a { padding: 0 0 20px; font-size: 15px; line-height: 1.6; color: var(--muted-fg); text-wrap: pretty; }
+  /* ---------- perguntas (details/summary: legível sem JavaScript) ---------- */
+  .faq { max-width: 760px; margin: 0 auto; padding: 80px var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-6); }
+  .faq-list { display: flex; flex-direction: column; border-top: 1px solid var(--c-divider); }
+  .faq-list details { border-bottom: 1px solid var(--c-divider); }
+  .faq-list summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: var(--sp-4); padding: 20px 0; font-size: 17px; font-weight: 600; cursor: pointer; min-height: 56px; }
+  .faq-list summary::-webkit-details-marker { display: none; }
+  .faq-list summary::after { content: "+"; font-size: 22px; line-height: 1; color: var(--c-accent-ink); flex-shrink: 0; }
+  .faq-list details[open] summary::after { content: "−"; }
+  .faq-list p { padding: 0 0 20px; font-size: 15px; line-height: 1.6; color: var(--c-secondary); text-wrap: pretty; }
 
   /* ---------- cta final ---------- */
   .final { padding-bottom: 80px; }
-  .final-card { position: relative; border-radius: 20px; overflow: hidden; min-height: 440px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); background: var(--navy); }
-  .final-media { position: relative; min-height: 320px; background: #1c2a4d; }
+  .final-card { position: relative; border-radius: 20px; overflow: hidden; min-height: 440px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); background: var(--c-background); color: var(--c-text); }
+  .final-media { position: relative; min-height: 320px; background: var(--c-surface-alt); }
   .final-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-  .final-copy { color: var(--on-navy); padding: clamp(32px, 5vw, 64px); display: flex; flex-direction: column; gap: 20px; align-items: flex-start; justify-content: center; }
+  .photo-credit { position: absolute; top: var(--sp-3); left: var(--sp-3); font-size: 11px; color: var(--c-text); background: var(--c-background); padding: 2px var(--sp-2); border-radius: var(--r-pill); }
+  .photo-credit:hover { color: var(--c-text); text-decoration: underline; }
+  .final-copy { padding: clamp(32px, 5vw, 64px); display: flex; flex-direction: column; gap: 20px; align-items: flex-start; justify-content: center; }
   .final-copy img { width: 48px; height: 48px; display: block; }
   .final-copy h2 { font-size: clamp(30px, 4vw, 44px); line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; text-wrap: balance; }
-  .final-copy p { font-size: 17px; color: var(--on-navy-soft); text-wrap: pretty; }
+  .final-copy p { font-size: 17px; color: var(--c-secondary); text-wrap: pretty; }
 
-  /* ---------- footer ---------- */
-  .site-footer { background: var(--navy); }
-  .site-footer .container { padding-top: 32px; padding-bottom: 32px; display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; justify-content: space-between; font-size: 13px; color: var(--on-navy-soft); }
+  /* ---------- rodapé ---------- */
+  .site-footer { background: var(--c-background); color: var(--c-secondary); }
+  .site-footer .container { padding-top: var(--sp-6); padding-bottom: var(--sp-6); display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-6); align-items: center; justify-content: space-between; font-size: 13px; }
   .foot-brand { display: flex; align-items: center; gap: 10px; }
   .foot-brand img { width: 28px; height: 28px; display: block; }
-  .foot-brand b { font-weight: 600; color: var(--on-navy); }
+  .foot-brand b { font-weight: 600; color: var(--c-text); }
   .site-footer nav { display: flex; flex-wrap: wrap; gap: 20px; }
-  .site-footer nav a { color: var(--on-navy-text); }
-  .site-footer nav a:hover { color: var(--primary); }
+  .site-footer a { color: var(--c-text); }
+  .site-footer a:hover { color: var(--c-accent-ink); }
 </style>
 </head>
 <body>
@@ -219,10 +225,11 @@
 <header class="site-header">
   <div class="container">
     <a class="brand" href="#topo">
-      <img src="assets/logo.png" alt="SmartDayZ">
+      <img src="assets/logo.png" alt="" width="32" height="32">
       <span>SmartDayZ</span>
     </a>
     <nav class="site-nav" aria-label="Seções">
+      <a href="#como-funciona">Como funciona</a>
       <a href="#recursos">Recursos</a>
       <a href="#oferta">Planos</a>
       <a href="#faq">Dúvidas</a>
@@ -237,33 +244,33 @@
 <main>
   <section id="topo" class="container hero">
     <div class="hero-copy">
-      <span class="badge-outline">Agenda inteligente de prioridades</span>
-      <h1>Seu dia, com <em>direção</em>.</h1>
-      <p class="hero-sub">Marque o que é urgente e o que é importante. O SmartDayZ organiza pela Matriz de Eisenhower e guarda o trabalho importante para o horário em que você rende mais.</p>
+      <span class="badge-outline">Agenda de prioridades com pico de energia</span>
+      <h1><!--b:assinatura-->O importante, na sua melhor hora.<!--/b--></h1>
+      <p class="hero-sub">Marque o que é urgente e o que é importante. O SmartDayZ guarda a hora em que você rende para o importante, até três por dia.</p>
       <div class="hero-actions">
-        <a class="btn lg" href="app/">Começar grátis</a>
-        <a class="btn outline lg" href="#demo">Ver como funciona</a>
+        <a class="btn" href="app/">Começar grátis</a>
+        <a class="btn outline" href="#como-funciona">Ver como funciona</a>
       </div>
       <p class="free-note"><span class="dot" aria-hidden="true"></span><span><b>Grátis para sempre.</b> Sem cadastro, sem cartão.</span></p>
     </div>
 
-    <div class="hero-media">
-      <img class="photo" src="https://images.unsplash.com/photo-1620809975674-10b8ff5f8e58?fm=jpg&q=80&w=1100&auto=format&fit=crop" alt="Pessoa sobrecarregada de demandas, sem saber por onde começar" width="1100" height="1375" fetchpriority="high">
-      <a class="photo-credit" href="https://unsplash.com/@elisa_ventur" target="_blank" rel="noopener">Foto: Elisa Ventur / Unsplash</a>
-      <div class="day-card" aria-label="Exemplo de dia montado">
-        <div class="day-card-top">
-          <span class="label-navy">Hoje · Pico 15h–22h</span>
-          <span class="pill soft">Trabalho</span>
-        </div>
-        <div class="slot-row"><time class="off">09:00</time><div class="slot off">Responder orçamentos<span class="pill">Delegar</span></div></div>
-        <div class="slot-row"><time>15:00</time><div class="slot">Enviar proposta<span class="pill">Fazer agora</span></div></div>
-        <div class="slot-row"><time>17:00</time><div class="slot">Planejar o trimestre<span class="pill">Foco</span></div></div>
-        <p>A proposta vence amanhã e é importante: entrou no início do seu pico.</p>
+    <div class="day-card" role="img" aria-label="Exemplo de dia montado: 9h Responder orçamentos, fora do pico; 15h Enviar proposta e 17h Planejar o trimestre, dentro do pico de 15h a 22h">
+      <div class="day-top"><b>Hoje · Trabalho</b><span>Seu pico: 15h–22h</span></div>
+      <div class="slot"><time>09:00</time><div class="it">Responder orçamentos<span class="q q-delegar">Delegar</span></div></div>
+      <div class="peak-band">
+        <div class="pb-head"><span>Pico de energia, 15h–22h</span><span class="num">2 de 3</span></div>
+        <div class="slot"><time>15:00</time><div class="it">Enviar proposta<span class="q q-fazer">Fazer agora</span></div></div>
+        <div class="slot"><time>17:00</time><div class="it">Planejar o trimestre<span class="q q-foco">Foco</span></div></div>
+        <div class="slot"><time>19:00</time><div class="it free">Livre para mais um importante</div></div>
+      </div>
+      <div class="rule">
+        <span class="lbl">Como o SmartDayZ montou</span>
+        <p>Importante vai para o seu pico, até três por dia. Urgente sem importância fica fora.</p>
       </div>
     </div>
   </section>
 
-  <section id="demo" class="band" aria-labelledby="demo-title">
+  <section id="como-funciona" class="band" aria-labelledby="demo-title">
     <div class="container demo">
       <div class="sec-head">
         <span class="eyebrow">Como funciona</span>
@@ -294,15 +301,14 @@
         <div class="demo-out">
           <span class="step-label">3 · Onde ela entra</span>
           <div class="quads">
-            <div class="quad" data-q="1"><b>Fazer agora</b><span>Urgente + importante</span><span class="chip">Enviar proposta</span></div>
-            <div class="quad" data-q="2"><b>Foco / Agendar</b><span>Importante, sem urgência</span><span class="chip">Enviar proposta</span></div>
-            <div class="quad" data-q="3"><b>Delegar</b><span>Urgente, não importante</span><span class="chip">Enviar proposta</span></div>
-            <div class="quad" data-q="4"><b>Eliminar</b><span>Nem urgente, nem importante</span><span class="chip">Enviar proposta</span></div>
+            <div class="quad on" data-q="1"><span class="q q-fazer">Fazer agora</span><span class="sub">Urgente e importante</span><span class="chip">Enviar proposta</span></div>
+            <div class="quad" data-q="2"><span class="q q-foco">Foco</span><span class="sub">Importante, sem urgência</span><span class="chip">Enviar proposta</span></div>
+            <div class="quad" data-q="3"><span class="q q-delegar">Delegar</span><span class="sub">Urgente, não importante</span><span class="chip">Enviar proposta</span></div>
+            <div class="quad" data-q="4"><span class="q q-eliminar">Eliminar</span><span class="sub">Nem urgente, nem importante</span><span class="chip">Enviar proposta</span></div>
           </div>
-          <div class="rule-card" aria-live="polite">
-            <span class="label-navy">Onde encaixar</span>
-            <p id="demoRule"></p>
-            <small>A regra do app: o que é importante vai para o seu pico de energia (até 3 por dia). O resto fica fora dele.</small>
+          <div class="rule-card theme-dark" aria-live="polite">
+            <span class="lbl">Como o SmartDayZ encaixa</span>
+            <p id="demoRule">Vence amanhã e é importante: entra hoje, no início do seu pico de energia, às 15:00.</p>
           </div>
         </div>
       </div>
@@ -316,19 +322,19 @@
     </div>
     <div class="feature-grid">
       <article class="feature">
-        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B1A3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg></span>
-        <h3>Agenda</h3>
-        <p>Compromissos e tarefas no mesmo dia, numa linha do tempo que destaca o seu pico de energia. Você escolhe a faixa no primeiro uso.</p>
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg></span>
+        <h3>Agenda com pico</h3>
+        <p>Compromissos e tarefas no mesmo dia, numa linha do tempo que mostra o seu pico de energia. Você escolhe a faixa no primeiro uso e muda quando quiser.</p>
       </article>
       <article class="feature">
-        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B1A3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"></rect><rect x="13" y="3" width="8" height="8" rx="1.5"></rect><rect x="3" y="13" width="8" height="8" rx="1.5"></rect><rect x="13" y="13" width="8" height="8" rx="1.5"></rect></svg></span>
-        <h3>Prioridades</h3>
-        <p>Matriz de Eisenhower para cada dia: Fazer agora, Foco, Delegar e Eliminar. Arraste ou toque para classificar, inclusive no celular.</p>
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"></rect><rect x="13" y="3" width="8" height="8" rx="1.5"></rect><rect x="3" y="13" width="8" height="8" rx="1.5"></rect><rect x="13" y="13" width="8" height="8" rx="1.5"></rect></svg></span>
+        <h3>Matriz do dia</h3>
+        <p>Matriz de Eisenhower para cada data: Fazer agora, Foco, Delegar e Eliminar. Arraste ou toque em Mover para classificar, inclusive no celular.</p>
       </article>
       <article class="feature">
-        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B1A3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path><path d="M19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"></path></svg></span>
-        <h3>IA que resolve <span class="pro-tag">PRO</span></h3>
-        <p>Delegue uma tarefa para a IA e receba o texto pronto (e-mail, mensagem, roteiro) ou o passo a passo. No relatório, uma dica sobre como você usou o pico.</p>
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path><path d="M19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"></path></svg></span>
+        <h3>Resolver com IA <span class="pro-tag">PRO</span></h3>
+        <p>A IA escreve o texto da tarefa ou o passo a passo para você revisar e usar. No relatório do pico, uma dica sobre o período. Ela não mexe na sua agenda.</p>
       </article>
     </div>
   </section>
@@ -338,7 +344,7 @@
       <div class="sec-head">
         <span class="eyebrow">Planos</span>
         <h2 id="plan-title" class="h2">Comece grátis. A matriz inteira já está incluída.</h2>
-        <p class="lead">O plano gratuito não expira e não pede cartão. O Pro é uma assinatura mensal, sem fidelidade.</p>
+        <p class="lead">O plano gratuito não expira e não pede cartão. O Pro é uma assinatura mensal ou anual, sem fidelidade.</p>
       </div>
       <div class="plan-grid">
         <div class="plan free">
@@ -351,29 +357,30 @@
           <ul class="checks">
             <li>Agenda e tarefas do dia</li>
             <li>Matriz de Eisenhower completa</li>
-            <li>Pico de energia protegido na linha do tempo</li>
-            <li>1 contexto (Pessoal, Estudos, Trabalho ou Meta)</li>
+            <li>Pico de energia na linha do tempo</li>
+            <li>1 contexto (Pessoal, Estudos, Trabalho ou Meta Principal)</li>
             <li>Histórico dos últimos 30 dias</li>
             <li>Funciona no navegador, sem instalar nada</li>
           </ul>
-          <a class="btn lg block" href="app/">Começar grátis</a>
+          <a class="btn block" href="app/">Começar grátis</a>
         </div>
-        <div class="plan pro">
+        <div class="plan pro theme-dark">
           <div class="plan-head">
             <span class="plan-name">SmartDayZ Pro</span>
-            <span class="price">R$ 14,90<small>/mês</small></span>
-            <span class="plan-note">Assinatura mensal · sem fidelidade</span>
+            <span class="price"><!--b:preco-mensal-->R$ 14,90<!--/b--><small>/mês</small></span>
+            <span class="plan-note">ou <b class="num"><!--b:preco-anual-->R$ 119<!--/b--></b> por ano · sem fidelidade</span>
           </div>
           <ul class="checks">
             <li>Tudo do Gratuito</li>
             <li>Vários contextos, cada um com sua agenda e matriz</li>
             <li>Histórico ilimitado</li>
-            <li>Relatório do pico de energia com dica de IA</li>
-            <li>Resolver tarefas com IA</li>
+            <li>Relatório do pico, com dica de IA</li>
+            <li>Resolver com IA</li>
             <li>Sincronização entre aparelhos</li>
-            <li>Exportar agenda (.ics e PDF) e temas</li>
+            <li>Exportar agenda (.ics e PDF) e tema escuro</li>
           </ul>
-          <a class="btn lg block" href="app/">Começar e conhecer o Pro</a>
+          <a class="btn block" href="app/">Começar e conhecer o Pro</a>
+          <span class="plan-foot">A assinatura ainda não está aberta. O gratuito já funciona completo.</span>
         </div>
       </div>
     </div>
@@ -384,31 +391,56 @@
       <span class="eyebrow">Dúvidas</span>
       <h2 id="faq-title" class="h2">Perguntas frequentes</h2>
     </div>
-    <div class="faq-list" id="faqList"></div>
+    <div class="faq-list">
+      <details name="faq" open>
+        <summary>Já tenho uma agenda. Por que mais uma?</summary>
+        <p>Toda agenda pergunta quando você está livre. O SmartDayZ pergunta quando você rende. Ele liga o que você anota à decisão do que vem primeiro e guarda a sua melhor hora para isso.</p>
+      </details>
+      <details name="faq">
+        <summary>Preciso criar conta?</summary>
+        <p>Não. O plano gratuito funciona direto no navegador e guarda seus dados neste aparelho. A conta (e-mail e senha) só é necessária para o Pro, que sincroniza entre aparelhos.</p>
+      </details>
+      <details name="faq">
+        <summary>O que é o pico de energia?</summary>
+        <p>A faixa do dia em que você rende. Você escolhe no primeiro uso (o padrão do app é 15h–22h) e muda quando quiser. O app não mede nada: a escolha é sua. Dentro do pico vão até três tarefas importantes por dia.</p>
+      </details>
+      <details name="faq">
+        <summary>Onde entra a IA?</summary>
+        <p>Só no Pro, em duas coisas: Resolver com IA, que escreve o texto ou o passo a passo de uma tarefa para você revisar, e uma dica no relatório do pico. A IA não mexe na sua agenda. A montagem do dia é uma regra do app.</p>
+      </details>
+      <details name="faq">
+        <summary>E se o meu dia mudar?</summary>
+        <p>Você reorganiza sem culpa: troque o horário ou mova a tarefa para outro quadrante. Sem sequência quebrada, sem aviso de dia perdido.</p>
+      </details>
+      <details name="faq">
+        <summary>Quanto custa o Pro?</summary>
+        <p><!--b:preco-mensal-->R$ 14,90<!--/b--> por mês ou <!--b:preco-anual-->R$ 119<!--/b--> por ano, sem fidelidade. A assinatura ainda não está aberta; o plano gratuito já funciona completo e continua com seus dados.</p>
+      </details>
+    </div>
   </section>
 
   <section class="container final" aria-labelledby="final-title">
-    <div class="final-card">
+    <div class="final-card theme-dark">
       <div class="final-media">
         <img src="https://images.unsplash.com/photo-1760084836111-b384c6d32104?fm=jpg&q=80&w=1100&auto=format&fit=crop" alt="Família aproveitando o tempo livre ao ar livre" loading="lazy" width="1100" height="733">
         <a class="photo-credit" href="https://unsplash.com/@rudnrina" target="_blank" rel="noopener">Foto: Iryna Studenets / Unsplash</a>
       </div>
       <div class="final-copy">
-        <img src="assets/logo-white.png" alt="">
+        <img src="assets/logo-white.png" alt="" width="48" height="48">
         <h2 id="final-title">O próximo passo começa com uma prioridade.</h2>
-        <p>Cadastre uma tarefa, marque urgência e importância e veja seu dia montado. Leva menos de dois minutos, e é grátis.</p>
-        <a class="btn lg" href="app/">Comece pela próxima tarefa</a>
+        <p>Cadastre uma tarefa, marque urgência e importância e veja seu dia montado. É grátis e não pede cadastro.</p>
+        <a class="btn" href="app/">Comece pela próxima tarefa</a>
       </div>
     </div>
   </section>
 </main>
 
-<footer class="site-footer">
+<footer class="site-footer theme-dark">
   <div class="container">
     <div class="foot-brand">
-      <img src="assets/logo-white.png" alt="SmartDayZ">
+      <img src="assets/logo-white.png" alt="" width="28" height="28">
       <b>SmartDayZ</b>
-      <span>· Seu dia, com direção.</span>
+      <span>· <!--b:assinatura-->O importante, na sua melhor hora.<!--/b--></span>
     </div>
     <nav aria-label="Rodapé">
       <a href="#recursos">Recursos</a>
@@ -423,13 +455,13 @@
 <script>
 (function () {
   "use strict";
-  // ---- demo: urgente × importante -> quadrante ----
+  // demo: urgente x importante -> quadrante (regra do app, sem IA)
   var urg = true, imp = true;
   var RULES = {
-    1: "Vence amanhã e é importante: entra hoje, no início do seu pico de energia (15:00).",
-    2: "Importante, mas sem prazo próximo: reserve um horário dentro do pico nos próximos dias, antes que vire urgência.",
-    3: "Tem prazo, mas não muda o essencial: dá para negociar ou passar adiante. Se ficar com você, faça fora do pico.",
-    4: "Nem urgente, nem importante: vale manter? Se não, elimine e libere espaço no dia."
+    1: "Vence amanhã e é importante: entra hoje, no início do seu pico de energia, às 15:00.",
+    2: "Importante, sem prazo próximo: vai para um horário dentro do pico nos próximos dias, antes de virar urgência.",
+    3: "Tem prazo, mas não muda o essencial: dá para negociar ou passar adiante. Se ficar com você, fica fora do pico.",
+    4: "Nem urgente, nem importante: vale manter? Se não, elimine e libere o dia."
   };
   var tUrg = document.getElementById("tUrg"), tImp = document.getElementById("tImp");
   function paint() {
@@ -441,35 +473,6 @@
   }
   tUrg.addEventListener("click", function () { urg = !urg; paint(); });
   tImp.addEventListener("click", function () { imp = !imp; paint(); });
-  paint();
-
-  // ---- FAQ (um aberto por vez) ----
-  var FAQ = [
-    ["Já tenho uma agenda. Por que mais um app?", "O SmartDayZ não substitui o registro: ele conecta o que você anota à decisão do que fazer primeiro. A agenda mostra quando, a matriz mostra o que merece atenção, e o pico de energia mostra onde encaixar o que é importante."],
-    ["Preciso criar conta?", "Não. O plano gratuito funciona direto no navegador e guarda seus dados neste aparelho. A conta (e-mail e senha) só é necessária para o Pro, que sincroniza entre aparelhos."],
-    ["O que é o pico de energia?", "O período do dia em que você rende melhor. Você escolhe essa faixa no primeiro uso (a sugestão é 15h–22h) e o app destaca esse horário para o trabalho importante, com no máximo 3 atividades por dia."],
-    ["Onde entra a IA?", "No Pro. Você marca uma tarefa como \"Delegar para Equipe/IA\" e pede para a IA resolver: ela entrega o texto pronto ou o passo a passo, e você decide o que usar. No relatório, a IA dá uma dica sobre como você usou o pico. Ela não muda sua agenda sozinha."],
-    ["O que acontece se meu dia mudar?", "Você reorganiza sem culpa: troque o horário ou arraste a tarefa para outro quadrante. Sem sequências quebradas, sem punição por ausência."],
-    ["Quanto custa o Pro e como cancelo?", "R$ 14,90 por mês, sem fidelidade. Você pode cancelar quando quiser, e o plano gratuito continua funcionando com seus dados."]
-  ];
-  var open = 0, list = document.getElementById("faqList");
-  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  function renderFaq() {
-    list.innerHTML = FAQ.map(function (f, i) {
-      var on = open === i;
-      return '<div class="faq-item"><button type="button" class="faq-q" data-i="' + i + '" aria-expanded="' + on + '" aria-controls="faq-a-' + i + '">' +
-        '<span>' + esc(f[0]) + '</span><i aria-hidden="true">' + (on ? "−" : "+") + '</i></button>' +
-        '<p class="faq-a" id="faq-a-' + i + '"' + (on ? "" : " hidden") + '>' + esc(f[1]) + '</p></div>';
-    }).join("");
-  }
-  list.addEventListener("click", function (e) {
-    var b = e.target.closest(".faq-q"); if (!b) return;
-    var i = Number(b.getAttribute("data-i"));
-    open = open === i ? -1 : i;
-    renderFaq();
-    var nb = list.querySelector('.faq-q[data-i="' + i + '"]'); if (nb) nb.focus();
-  });
-  renderFaq();
 })();
 </script>
 </body>
