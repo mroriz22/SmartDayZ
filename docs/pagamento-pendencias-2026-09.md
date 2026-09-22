@@ -34,6 +34,8 @@ tudo que envolve dinheiro é decisão da Wanessa.
 
 5. **Preço:** o combinado antigo era R$ 39,90 e o produto está em R$ 29,90. Só ela decide
    qual vale.
+   **Decidido em 22/09/2026: R$ 14,90 por mês.** O site e o app já mostram esse valor;
+   falta trocar o preço do produto SmartDayZ Pro na Quack, que ainda cobra R$ 29,90.
 
 6. **IA sem chave.** `GEMINI_API_KEY` não está no Coolify, então "Delegar para IA"
    responde "A IA ainda não está configurada". A chave antiga ficou presa na Edge Function
