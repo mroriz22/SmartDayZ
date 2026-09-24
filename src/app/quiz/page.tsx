@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { QuizFlow } from "@/components/product/quiz-flow";
+import { factoryConfig } from "@/factory/config";
+import { OnboardingFlow } from "@/components/product/onboarding/onboarding-flow";
 
 export const metadata: Metadata = {
-  title: "Quiz — SmartDayZ",
+  title: "Monte seu primeiro dia — SmartDayZ",
   description:
-    "4 perguntas sobre a sua agenda. Sem cadastro. No fim você entra no teste de 7 dias.",
+    "Quatro passos curtos: seu horário, seu contexto e a primeira tarefa na matriz. Sem cartão.",
   robots: { index: true },
 };
 
 export default function QuizPage() {
-  return <QuizFlow />;
+  return <OnboardingFlow trialDias={factoryConfig.trialDays} />;
 }

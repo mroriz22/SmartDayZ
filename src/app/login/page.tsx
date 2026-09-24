@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { lerRespostas } from "@/lib/product/onboarding";
 import { authClient } from "@/lib/auth-client";
 
 /** Traduz o recado técnico do Better Auth pra uma frase que a pessoa entende. */
@@ -28,6 +29,19 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const id = useId();
+
+  // Vindo do onboarding (/quiz): abre no cadastro e reaproveita nome e e-mail
+  // que a pessoa já digitou lá (ficam no aparelho, não na URL).
+  // (lido depois da hidratação: localStorage e URL só existem no navegador)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (new URLSearchParams(window.location.search).get("modo") === "cadastro") setMode("signup");
+      const r = lerRespostas();
+      if (r?.email) setEmail((e) => e || r.email || "");
+      if (r?.nome) setName((n) => n || r.nome || "");
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

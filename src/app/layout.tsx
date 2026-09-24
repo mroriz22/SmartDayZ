@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import { SuporteWhatsApp } from "@/factory/SuporteWhatsApp";
 
@@ -9,12 +9,18 @@ const manrope = Manrope({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
 const appName = process.env.APP_NAME ?? "SmartDayZ";
 
 export const metadata: Metadata = {
-  title: `${appName} — sua agenda no seu melhor horário`,
+  title: `${appName} — seu dia, com direção`,
   description:
-    "Organize o dia pelo seu ritmo biológico: tarefa difícil no pico de energia, tarefa leve na queda. Com IA que resolve a tarefa por você.",
+    "Organize tarefas, enxergue urgência e importância e monte o dia com a matriz de Eisenhower e o seu pico de energia. A decisão final é sempre sua.",
 };
 
 export default function RootLayout({
@@ -23,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${manrope.variable} h-full antialiased`}>
+    <html lang="pt-BR" className={`${manrope.variable} ${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         {children}
         <SuporteWhatsApp produto={appName} />

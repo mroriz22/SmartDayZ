@@ -21,6 +21,19 @@
 
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 
+  /* Landing e onboarding (design de 23/09/2026): marinho + laranja da logo
+     sobre cinza claro, tipografia Inter. */
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --color-navy: #0b1a40;       /* títulos e superfícies escuras */
+  --color-navy-soft: #1c2b52;  /* hover sobre marinho */
+  --color-orange: #fb7915;     /* ação principal (texto marinho por cima) */
+  --color-orange-text: #e0650a;/* laranja pra texto pequeno sobre claro */
+  --color-orange-soft: #fff3e8;/* seleção */
+  --color-canvas: #f6f7f9;     /* fundo */
+  --color-line: #e4e7ec;       /* borda */
+  --color-body: #475467;       /* texto corrido */
+  --color-soft: #667085;       /* texto apagado */
+
   --radius-card: 24px;
   --radius-product: 16px;
   --radius-btn: 8px;
