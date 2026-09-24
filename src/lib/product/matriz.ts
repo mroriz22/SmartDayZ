@@ -1,16 +1,17 @@
 /**
  * A matriz de Eisenhower como o app (/app, public/agenda.html) mostra hoje.
- * Os nomes e o pico vêm de lá (const QUAD e PEAK_START/PEAK_END): a landing e
- * o onboarding não prometem rótulo nem horário que a agenda não usa.
+ * Os nomes são os do design de 23/09/2026 e são os mesmos do const QUAD de lá;
+ * o pico vem de PEAK_START/PEAK_END. Os ids (q1..q4) é que ficam gravados na
+ * agenda — os nomes são só exibição, então trocar nome não quebra agenda salva.
  */
 
 export type QuadId = "q1" | "q2" | "q3" | "q4";
 
 export const QUADRANTES: Record<QuadId, { nome: string; regra: string }> = {
   q1: { nome: "Fazer agora", regra: "Urgente + importante" },
-  q2: { nome: "Foco / Agendar", regra: "Importante, sem urgência" },
-  q3: { nome: "Delegar", regra: "Urgente, não importante" },
-  q4: { nome: "Eliminar", regra: "Nem urgente, nem importante" },
+  q2: { nome: "Planejar", regra: "Importante, sem urgência" },
+  q3: { nome: "Delegar ou negociar", regra: "Urgente, não importante" },
+  q4: { nome: "Reavaliar", regra: "Nem urgente, nem importante" },
 };
 
 export const ORDEM_QUADRANTES: QuadId[] = ["q1", "q2", "q3", "q4"];

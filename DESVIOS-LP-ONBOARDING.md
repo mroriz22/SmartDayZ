@@ -12,12 +12,13 @@ e o que ficou no lugar. Regra: vale o que o app (`public/agenda.html`) faz hoje.
   (pricing, paywall e painel do app). Landing e tela 7/7 mostram R$ 14,90 e os 7 dias de
   teste sem cartão.
 
-## Nomes dos quadrantes
-- Design: *Fazer agora, Planejar, Delegar ou negociar, Reavaliar*.
-  App: *Fazer agora, Foco / Agendar, Delegar, Eliminar* (`const QUAD` em agenda.html).
-  Landing e onboarding usam os nomes do app (`src/lib/product/matriz.ts`), para a pessoa
-  achar na agenda o que viu na venda. **Decisão pendente:** se quiserem os nomes do design,
-  é trocar 3 strings no `QUAD` do agenda.html e em `matriz.ts`.
+## Nomes dos quadrantes — resolvido (24/09/2026)
+- Não é mais desvio: por decisão da Wanessa, o app inteiro adotou os nomes do design —
+  *Fazer agora, Planejar, Delegar ou negociar, Reavaliar* (landing, onboarding,
+  `src/lib/product/matriz.ts` e o `QUAD` de `public/agenda.html`, incluindo os avisos e o
+  relatório). Só os rótulos exibidos mudaram: os ids gravados (`q1`..`q4`) continuam os
+  mesmos, então agendas já salvas não quebram. "Delegar para Equipe/IA" é outro recurso (a
+  marcação de delegar) e continua com esse nome.
 - A frase "Em lista no celular" virou "No celular vira uma coluna só" — é o que o app faz
   (grid de 1 coluna abaixo de 760px).
 

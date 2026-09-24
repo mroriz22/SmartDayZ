@@ -315,7 +315,7 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
                 </p>
                 <p className="mt-2.5 text-sm leading-relaxed text-body">
                   {alvoExemplo === "q2"
-                    ? "Ainda falta um mês, mas a prova importa. Foco / Agendar reserva tempo antes que vire urgência."
+                    ? "Ainda falta um mês, mas a prova importa. Planejar reserva tempo antes que vire urgência."
                     : alvoExemplo === "q1"
                       ? "Se a prova fosse amanhã, entraria aqui: faça logo, de preferência no pico."
                       : alvoExemplo === "q3"

@@ -31,7 +31,7 @@ const RECURSOS: { icone: keyof typeof ICONES; titulo: string; texto: string }[] 
     icone: "matriz",
     titulo: "Prioridades",
     texto:
-      "Matriz de Eisenhower com quatro caixas: Fazer agora, Foco / Agendar, Delegar e Eliminar. No celular vira uma coluna só, sem quadrantes ilegíveis.",
+      "Matriz de Eisenhower com rótulos que se entendem: Fazer agora, Planejar, Delegar ou negociar, Reavaliar. No celular vira uma coluna só, sem quadrantes ilegíveis.",
   },
   {
     icone: "ia",

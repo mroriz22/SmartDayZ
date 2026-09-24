@@ -766,7 +766,7 @@
     </div>
     <p class="matrix-intro">
       Arraste (ou toque) cada atividade para o quadrante certo. <b>Importante</b> (vermelho/verde) puxa pro seu
-      <span style="color:var(--gold)">pico de energia 15h–22h</span> — sobretudo o quadrante <b>Foco</b>, onde mora o trabalho que muda o jogo.
+      <span style="color:var(--gold)">pico de energia 15h–22h</span> — sobretudo o quadrante <b>Planejar</b>, onde mora o trabalho que muda o jogo.
     </p>
 
     <div class="inbox" id="inbox" data-quad="none">
@@ -782,7 +782,7 @@
     <div class="report-head">
       <div>
         <h2 class="report-title">Aproveitamento do pico</h2>
-        <p class="report-sub">Quanto do seu trabalho importante (Fazer agora / Foco) caiu no pico de energia 15h–22h.</p>
+        <p class="report-sub">Quanto do seu trabalho importante (Fazer agora / Planejar) caiu no pico de energia 15h–22h.</p>
         <p class="report-period" id="reportPeriod"></p>
       </div>
       <div class="report-controls">
@@ -831,7 +831,7 @@
         </div>
       </div>
       <button type="button" id="evAiBtn" class="ai-btn">Delegar para Equipe/IA</button>
-      <div class="ai-hint">Libera esta atividade pra qualquer quadrante da Matriz — menos Eliminar — pra passar pra equipe ou mandar a IA resolver.</div>
+      <div class="ai-hint">Libera esta atividade pra qualquer quadrante da Matriz — menos Reavaliar — pra passar pra equipe ou mandar a IA resolver.</div>
       <button type="button" id="evResolveBtn" class="btn ai-resolve-btn" style="display:none">Resolver com IA agora</button>
       <button type="button" id="evSosBtn" class="sos-btn">SOS — emergência</button>
       <div class="sos-hint">Use só pra emergência que precisa cair no pico (15h–22h) da agenda Pessoal.</div>
@@ -863,7 +863,7 @@
         </div>
       </div>
       <button type="button" id="tkAiBtn" class="ai-btn">Delegar para Equipe/IA</button>
-      <div class="ai-hint">Libera esta atividade pra qualquer quadrante da Matriz — menos Eliminar — pra passar pra equipe ou mandar a IA resolver.</div>
+      <div class="ai-hint">Libera esta atividade pra qualquer quadrante da Matriz — menos Reavaliar — pra passar pra equipe ou mandar a IA resolver.</div>
       <button type="button" id="tkResolveBtn" class="btn ai-resolve-btn" style="display:none">Resolver com IA agora</button>
       <button type="button" id="tkSosBtn" class="sos-btn">SOS — emergência</button>
       <div class="sos-hint">Use só pra emergência que precisa cair no pico (15h–22h) da agenda Pessoal.</div>
@@ -1021,9 +1021,9 @@
   const TL_START = 6 * 60, TL_END = 23 * 60;         // janela da timeline
   const QUAD = {
     q1: { name: "Fazer agora", tag: "1", sub: "Urgente + Importante", color: "var(--q1)", important: true, tip: "Crítico — encaixe no pico se exigir cabeça" },
-    q2: { name: "Foco / Agendar", tag: "2", sub: "Importante + Não urgente", color: "var(--q2)", important: true, tip: "Onde mora o que muda o jogo — proteja o pico 15h–22h" },
-    q3: { name: "Delegar", tag: "3", sub: "Urgente + Não importante", color: "var(--q3)", important: false, tip: "" },
-    q4: { name: "Eliminar", tag: "4", sub: "Nem urgente nem importante", color: "var(--q4)", important: false, tip: "" }
+    q2: { name: "Planejar", tag: "2", sub: "Importante + Não urgente", color: "var(--q2)", important: true, tip: "Onde mora o que muda o jogo — proteja o pico 15h–22h" },
+    q3: { name: "Delegar ou negociar", tag: "3", sub: "Urgente + Não importante", color: "var(--q3)", important: false, tip: "" },
+    q4: { name: "Reavaliar", tag: "4", sub: "Nem urgente nem importante", color: "var(--q4)", important: false, tip: "" }
   };
   const QORDER = ["q1", "q2", "q3", "q4"];
   // duas marcações de Eisenhower (um clique cada): Importante (impacto) e Urgente (tempo).
@@ -1034,7 +1034,7 @@
   function effUrg(item) { return markUrg(item) || (item && item.due && !item.entrega && daysUntil(item.due) <= 2); }
   // quadrantes permitidos por (importante, urgente-efetivo):
   //  imp+urg -> só q1 | imp -> q1,q2 | urg -> q1,q3 | nenhum -> só q4
-  // "Delegar para Equipe/IA" quebra TODAS as barreiras: aceita em qualquer quadrante MENOS Eliminar (q4).
+  // "Delegar para Equipe/IA" quebra TODAS as barreiras: aceita em qualquer quadrante MENOS Reavaliar (q4).
   function allowedQuads(item) {
     if (markAI(item)) return ["q1", "q2", "q3"]; // delegado vai pra onde precisar — só não se descarta
     const i = markImp(item), u = effUrg(item);
@@ -1687,17 +1687,17 @@
     const urgTxt = dueUrg ? "urgente (prazo em ≤2 dias)" : "urgente";
     if (quad === "q1") return "Fazer Agora é pra o que é urgente ou importante. " + nm + " não está marcada como nenhum dos dois — marque Urgente e/ou Importante primeiro.";
     if (quad === "q2") {
-      if (!markImp(item)) return "Agendar é pra trabalho importante. " + nm + " não está marcada como Importante.";
-      return "Agendar é pra o importante NÃO urgente. " + nm + " é " + urgTxt + " — aqui perderia o prazo; o lugar é Fazer Agora.";
+      if (!markImp(item)) return "Planejar é pra trabalho importante. " + nm + " não está marcada como Importante.";
+      return "Planejar é pra o importante NÃO urgente. " + nm + " é " + urgTxt + " — aqui perderia o prazo; o lugar é Fazer agora.";
     }
     if (quad === "q3") {
-      if (markImp(item)) return "Delegar é pra o que NÃO é importante. " + nm + " está marcada como Importante — foque nela, não delegue.";
-      return "Delegar é pra o urgente (mas não importante). " + nm + " não está marcada como Urgente — ligue “Delegar para Equipe/IA” na edição pra mandar mesmo sem urgência.";
+      if (markImp(item)) return "Delegar ou negociar é pra o que NÃO é importante. " + nm + " está marcada como Importante — foque nela, não delegue.";
+      return "Delegar ou negociar é pra o urgente (mas não importante). " + nm + " não está marcada como Urgente — ligue “Delegar para Equipe/IA” na edição pra mandar mesmo sem urgência.";
     }
     if (quad === "q4") {
-      if (markAI(item)) return "Eliminar não recebe o que está delegado. " + nm + " está em “Delegar para Equipe/IA” — se é pra descartar, desligue a delegação primeiro.";
-      if (markImp(item)) return "Eliminar é pra o que não importa. " + nm + " está marcada como Importante — não descarte.";
-      return "Eliminar é pra o que não é urgente. " + nm + " é " + urgTxt + " — trate antes de descartar.";
+      if (markAI(item)) return "Reavaliar não recebe o que está delegado. " + nm + " está em “Delegar para Equipe/IA” — se é pra descartar, desligue a delegação primeiro.";
+      if (markImp(item)) return "Reavaliar é pra o que não importa. " + nm + " está marcada como Importante — não descarte.";
+      return "Reavaliar é pra o que não é urgente. " + nm + " é " + urgTxt + " — trate antes de descartar.";
     }
     return null;
   }
@@ -2221,7 +2221,7 @@
   }
 
   // motor de sugestões: (1) horários fora do pico / sem hora no período; (2) urgência por PRAZO.
-  // urgência ≠ importância: o prazo curto sugere subir no eixo da urgência (Foco → Fazer agora),
+  // urgência ≠ importância: o prazo curto sugere subir no eixo da urgência (Planejar → Fazer agora),
   // nunca inventa importância (impacto continua sendo decisão do usuário).
   function reportSuggestions(d) {
     const out = [];
@@ -2258,9 +2258,9 @@
       const dd = daysUntil(t.due);
       const dl = dd === 0 ? "vence hoje" : "vence em " + dd + (dd === 1 ? " dia" : " dias");
       const nm = "“" + escapeHTML(t.title) + "”";
-      if (isImportant(t) && t.quad === "q2" && dd <= 2) out.push({ type: "urg", text: nm + " " + dl + " e está em Foco. Com o prazo colado, suba pra Fazer agora." });
+      if (isImportant(t) && t.quad === "q2" && dd <= 2) out.push({ type: "urg", text: nm + " " + dl + " e está em Planejar. Com o prazo colado, suba pra Fazer agora." });
       else if (!t.quad && dd <= 7) out.push({ type: "urg", text: nm + " " + dl + " e ainda está sem classificar na Matriz." });
-      else if (t.quad === "q4" && dd <= 3) out.push({ type: "urg", text: nm + " está em Eliminar, mas " + dl + ". Revise se ainda faz sentido descartar." });
+      else if (t.quad === "q4" && dd <= 3) out.push({ type: "urg", text: nm + " está em Reavaliar, mas " + dl + ". Revise se ainda faz sentido descartar." });
     });
     return out;
   }
@@ -2284,7 +2284,7 @@
     let html;
     if (!d.importantCount) {
       html = '<div class="panel"><div class="empty"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-target"/></svg>' + 'Sem atividades importantes ' + scopeLabel + '.<br>' +
-        'Classifique compromissos e tarefas como <b>Fazer agora</b> ou <b>Foco</b> na Matriz pra acompanhar quanto do seu trabalho que muda o jogo cai no pico.</div></div>';
+        'Classifique compromissos e tarefas como <b>Fazer agora</b> ou <b>Planejar</b> na Matriz pra acompanhar quanto do seu trabalho que muda o jogo cai no pico.</div></div>';
     } else {
       let insight, cls;
       if (d.pct === null) { insight = "Suas atividades importantes estão sem horário. Defina horários pra ver quanto cai no pico."; cls = "neutral"; }
