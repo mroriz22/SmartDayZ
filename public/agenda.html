@@ -99,7 +99,7 @@
 
   /* ---------- LAYOUT ---------- */
   .grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 1.25rem; align-items: start; }
-  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 880px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 
   .panel {
     border: 1px solid var(--line); background: var(--card);
@@ -122,10 +122,11 @@
   .icon-btn.locked::after { content: ""; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b3560a' stroke-width='2.2' stroke-linecap='round'%3E%3Crect x='5' y='10.5' width='14' height='10' rx='2'/%3E%3Cpath d='M8.5 10.5V7.6a3.5 3.5 0 0 1 7 0v2.9'/%3E%3C/svg%3E") center/contain no-repeat; width: 9px; height: 9px; position: absolute; top: -5px; right: -5px; }
   .month-label { font-size: 0.98rem; font-weight: 600; min-width: 150px; text-align: center; text-transform: capitalize; }
 
-  .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
+  .weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-bottom: 6px; }
   .weekdays span { text-align: center; font-size: 0.7rem; color: var(--faint); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
   .day {
+    min-width: 0; padding: 0;
     aspect-ratio: 1 / 1; border-radius: 10px; border: 1px solid transparent;
     background: transparent; color: var(--txt); cursor: pointer; position: relative;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -303,10 +304,13 @@
   /* ---------- MODAL ---------- */
   .overlay {
     position: fixed; inset: 0; background: rgba(8, 12, 24, 0.7); backdrop-filter: blur(4px);
-    display: none; align-items: center; justify-content: center; padding: 1.5rem; z-index: 100;
+    display: none; align-items: flex-start; justify-content: center; padding: 1.5rem; z-index: 100;
+    /* modal mais alto que a tela (celular) rola por dentro do fundo, sem cortar o rodapé */
+    overflow-y: auto; overscroll-behavior: contain;
   }
   .overlay.open { display: flex; }
   .modal {
+    margin: auto 0; /* centraliza quando cabe; quando não cabe, começa no topo e rola */
     width: 100%; max-width: 440px; border: 1px solid var(--line-strong);
     background: linear-gradient(180deg, #1e293b, #172033); border-radius: 18px; padding: 1.5rem;
     box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
@@ -451,6 +455,25 @@
     .tabs button .tx-ico { display: none; }
     .tabs { gap: 2px; }
     .topbar-actions .icon-btn { width: 32px; height: 32px; }
+  }
+  /* celular estreito (iPhone SE, 320px): o app cabia só com zoom reduzido */
+  @media (max-width: 400px) {
+    .wrap { padding: 0.9rem 0.75rem; }
+    .panel { padding: 0.9rem; }
+    .overlay { padding: 0.75rem; }
+    .modal { padding: 1.15rem; }
+    .weekdays span { letter-spacing: 0; font-size: 0.62rem; }
+    /* abas na linha inteira; exportar/perfil/tema descem para a direita */
+    .topbar { flex-wrap: wrap; gap: 0.5rem; }
+    .tabs { width: 100%; margin-bottom: 0; }
+    .tabs button { flex: 1; padding: 0.45rem 0.4rem; }
+    .topbar-actions { margin-left: auto; gap: 0.3rem; }
+    /* os quatro cartões do topo em 2 x 2 */
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; width: 100%; }
+    .stat { width: auto; padding: 0 0.75rem; }
+    #addBtn { height: 62px; }
+    .month-label { min-width: 0; flex: 1; font-size: 0.92rem; }
+    .cal-nav { gap: 0.25rem; flex: 1; min-width: 0; }
   }
   .settings-btn { font-size: 1.05rem; }
   .icon-btn.lockable { position: relative; overflow: visible; }
@@ -1674,7 +1697,8 @@
 
     const hours = document.createElement("div"); hours.className = "tl-hours";
     const passo = TL_END - TL_START > 20 * 60 ? 4 : 3;
-    for (let h = Math.ceil(TL_START / 60 / passo) * passo; h * 60 < TL_END; h += passo) {
+    // sem rótulo colado nas pontas: metade dele ficaria cortada
+    for (let h = Math.ceil((TL_START + 60) / 60 / passo) * passo; h * 60 < TL_END - 30; h += passo) {
       const s = document.createElement("span"); s.textContent = (h % 24) + "h"; s.style.left = pct(h * 60) + "%"; hours.appendChild(s);
     }
     tl.appendChild(hours);

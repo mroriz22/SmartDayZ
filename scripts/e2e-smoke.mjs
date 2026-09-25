@@ -34,9 +34,14 @@ console.log("smoke SmartDayZ em " + BASE + "\n");
 const home = await pega("/");
 check("home responde 200", home.status === 200, "status " + home.status);
 check("home fala do SmartDayZ", /SmartDayZ/.test(home.corpo));
-check("home leva ao app", /href="\/app"/.test(home.corpo));
-check("home leva ao preco", /href="\/pricing"/.test(home.corpo));
+// landing de 23/09: as chamadas levam ao onboarding (/quiz) e o preço fica na própria página
+check("home leva ao onboarding", /href="\/quiz"/.test(home.corpo));
+check("home mostra o preco", /id="planos"/.test(home.corpo) && /R\$ ?14,90/.test(home.corpo));
+check("home nao abre o onboarding de venda", !/onboarding\/sdk\/onboarding\.js/.test(home.corpo));
 check("home leva ao login", /href="\/login"/.test(home.corpo));
+
+const quiz = await pega("/quiz");
+check("quiz responde 200", quiz.status === 200, "status " + quiz.status);
 
 // 2. O produto
 const app = await pega("/app");
