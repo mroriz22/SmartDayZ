@@ -35,6 +35,10 @@ export function rotuloPico(p: Pico) {
 
 export type PeriodoRende = "manha" | "tarde" | "tarde-noite" | "madrugada";
 export type HoraAcorda = "antes-6" | "6-8" | "8-10" | "depois-10";
+/** "Não sei" é resposta: a pergunta é obrigatória, mas ninguém precisa chutar. */
+export const NAO_SEI = "nao-sei";
+export type RespostaPeriodo = PeriodoRende | typeof NAO_SEI;
+export type RespostaAcorda = HoraAcorda | typeof NAO_SEI;
 
 const HORA_ACORDA: Record<HoraAcorda, number> = {
   "antes-6": 5,
@@ -44,17 +48,18 @@ const HORA_ACORDA: Record<HoraAcorda, number> = {
 };
 
 /**
- * Onde cai o pico de cada período: começa algumas horas depois de acordar,
- * mas sem sair da faixa que a pessoa disse que rende.
+ * A faixa de cada período, que é o horário escrito no card do onboarding e do
+ * perfil: o pico cai sempre dentro dela, começando algumas horas depois de
+ * acordar. Espelhada em public/agenda.html (FAIXA_PICO); mudou aqui, muda lá.
  */
-const FAIXA: Record<PeriodoRende, { depoisDeAcordar: number; min: number; max: number; horas: number }> = {
-  manha: { depoisDeAcordar: 1, min: 6, max: 8, horas: 5 },
-  tarde: { depoisDeAcordar: 4, min: 10, max: 12, horas: 5 },
-  "tarde-noite": { depoisDeAcordar: 8, min: 14, max: 17, horas: 6 },
-  madrugada: { depoisDeAcordar: 11, min: 18, max: 19, horas: 5 },
+export const FAIXA: Record<PeriodoRende, { de: number; ate: number; horas: number; depoisDeAcordar: number }> = {
+  manha: { de: 6, ate: 12, horas: 5, depoisDeAcordar: 1 },
+  tarde: { de: 11, ate: 17, horas: 5, depoisDeAcordar: 4 },
+  "tarde-noite": { de: 15, ate: 22, horas: 6, depoisDeAcordar: 8 },
+  madrugada: { de: 19, ate: 24, horas: 5, depoisDeAcordar: 11 },
 };
 
-/** Sem a resposta de quando rende, o horário de acordar sugere o período. */
+/** Sem saber quando rende, o horário de acordar sugere o período. */
 const PERIODO_POR_ACORDA: Record<HoraAcorda, PeriodoRende> = {
   "antes-6": "manha",
   "6-8": "tarde",
@@ -62,11 +67,13 @@ const PERIODO_POR_ACORDA: Record<HoraAcorda, PeriodoRende> = {
   "depois-10": "madrugada",
 };
 
-/** O pico da pessoa, a partir do perfil que ela respondeu no onboarding. */
-export function definirPico(periodo: PeriodoRende | null, acorda: HoraAcorda | null): Pico {
-  if (!periodo && !acorda) return PICO_PADRAO;
-  const faixa = FAIXA[periodo ?? PERIODO_POR_ACORDA[acorda!]];
-  const acordaAs = acorda ? HORA_ACORDA[acorda] : 7;
-  const inicio = Math.min(faixa.max, Math.max(faixa.min, acordaAs + faixa.depoisDeAcordar));
-  return { inicio, fim: Math.min(24, inicio + faixa.horas) };
+/** O pico da pessoa, a partir do perfil que ela respondeu. */
+export function definirPico(periodo: RespostaPeriodo | null, acorda: RespostaAcorda | null): Pico {
+  const sabePeriodo = periodo && periodo !== NAO_SEI ? periodo : null;
+  const sabeAcorda = acorda && acorda !== NAO_SEI ? acorda : null;
+  if (!sabePeriodo && !sabeAcorda) return PICO_PADRAO;
+  const faixa = FAIXA[sabePeriodo ?? PERIODO_POR_ACORDA[sabeAcorda!]];
+  const acordaAs = sabeAcorda ? HORA_ACORDA[sabeAcorda] : 7;
+  const inicio = Math.min(faixa.ate - faixa.horas, Math.max(faixa.de, acordaAs + faixa.depoisDeAcordar));
+  return { inicio, fim: inicio + faixa.horas };
 }

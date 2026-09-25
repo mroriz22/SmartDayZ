@@ -1,8 +1,8 @@
 import {
   definirPico,
   quadrante,
-  type HoraAcorda,
-  type PeriodoRende,
+  type RespostaAcorda,
+  type RespostaPeriodo,
   type Pico,
   type QuadId,
 } from "./matriz";
@@ -16,7 +16,7 @@ import {
  *   agenda, gravamos o store `agenda.v3` no formato que public/agenda.html lê.
  *   Com `updatedAt: 0`, qualquer agenda que já exista na nuvem vence o merge
  *   (o app guarda backup do local antes), então o onboarding nunca apaga dado.
- * - O pico sai do perfil (quando rende + quando acorda). Vai no store como
+ * - O pico sai do perfil (quando rende + quando acorda; "não sei" vale). Vai no store como
  *   `peak`; se a agenda já existia, o app lê daqui (`pico`) e adota.
  */
 
@@ -24,7 +24,7 @@ export const CHAVE_ONBOARDING = "smartdayz:onboarding";
 const CHAVE_AGENDA = "agenda.v3";
 const CHAVES_ANTIGAS = ["agenda.v2", "agenda.v1"];
 
-export type Janela = PeriodoRende;
+export type Janela = RespostaPeriodo;
 export type Contexto = "pessoal" | "trabalho" | "meta";
 
 export type TarefaOnboarding = {
@@ -37,7 +37,7 @@ export type RespostasOnboarding = {
   nome: string;
   email: string;
   janela: Janela | null;
-  acorda: HoraAcorda | null;
+  acorda: RespostaAcorda | null;
   contexto: Contexto | null;
   tarefas: TarefaOnboarding[];
 };

@@ -23,13 +23,17 @@ e o que ficou no lugar. Regra: vale o que o app (`public/agenda.html`) faz hoje.
   (grid de 1 coluna abaixo de 760px).
 
 ## Pico de energia
-- Desde 25/09/2026 o pico é de cada pessoa. O passo 1 pergunta quando ela rende melhor (as 4
-  opções do design, sem selo) e, a mais, que horas acorda num dia livre. `definirPico`
-  (`src/lib/product/matriz.ts`) cruza as duas e mostra o resultado na hora ("Seu pico 8h–13h").
-  O design não tinha a segunda pergunta.
-- O pico vai para a agenda como `store.peak` e sincroniza com a nuvem; se a agenda já
-  existia, o app adota o `pico` salvo em `smartdayz:onboarding`. Quem pula as duas
-  perguntas fica com 15h–22h. Ainda não há tela no app para mudar o pico depois.
+- Desde 25/09/2026 o pico é de cada pessoa. O passo 1 pergunta quando ela rende melhor e, a
+  mais do design, que horas acorda num dia livre. As duas são obrigatórias (sem "Pular" nesse
+  passo), com a opção "Não sei" em cada uma. `definirPico` (`src/lib/product/matriz.ts`)
+  cruza as respostas e mostra o resultado na hora ("Seu pico 12h–17h").
+- Os horários dos cards mudaram para a faixa onde o pico pode cair: Manhã 6h–12h, Tarde
+  11h–17h, Tarde/Noite 15h–22h e Noite 19h–24h ("Madrugada / Após 22h" virou "Noite", porque
+  a agenda vai até 24h). O id gravado continua `madrugada`.
+- Os dois "Não sei" dão 15h–22h; só um deles, a outra resposta decide.
+- O pico vai para a agenda como `store.peak` (com as respostas) e sincroniza com a nuvem. No
+  app, o botão de perfil (ícone de pessoa, ao lado da engrenagem) refaz as perguntas ou
+  ajusta início e fim na mão. A conta está espelhada em `FAIXA_PICO` no agenda.html.
 
 ## IA
 - O app não tem sugestão com **Aceitar / Editar / Recusar / desfazer**. A IA (Pro) escreve

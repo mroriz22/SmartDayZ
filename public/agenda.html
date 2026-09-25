@@ -466,6 +466,19 @@
   .export-opt .eo-txt { display: flex; flex-direction: column; }
   .export-opt .eo-txt b { font-size: 0.92rem; }
   .export-opt .eo-txt small { font-size: 0.76rem; color: var(--muted); margin-top: 1px; }
+  /* perfil: pico de energia */
+  .pf-now { display: flex; align-items: baseline; justify-content: space-between; padding: 0.7rem 0.9rem; border-radius: 12px; background: var(--accent); color: #fff; margin-bottom: 1rem; }
+  .pf-now span { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; }
+  .pf-now b { font-size: 1.25rem; }
+  .pf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+  .pf-opt { padding: 0.5rem 0.6rem; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--card); color: var(--txt); font: inherit; font-size: 0.85rem; font-weight: 600; text-align: left; cursor: pointer; transition: all .12s; }
+  .pf-opt small { display: block; color: var(--muted); font-weight: 500; font-size: 0.75rem; }
+  .pf-opt:hover { border-color: var(--accent-border); }
+  .pf-opt.on { border-color: var(--gold); background: rgba(169,130,47,0.14); }
+  .pf-opt.wide { grid-column: span 2; }
+  .pf-opt:focus-visible, .pf-sel:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pf-sel { width: 100%; padding: 0.55rem 0.7rem; border-radius: 10px; border: 1px solid var(--line); background: var(--bg-0); color: var(--txt); font: inherit; font-size: 0.9rem; }
+  .pf-why { font-size: 0.8rem; color: var(--muted); line-height: 1.45; margin: -0.3rem 0 0.6rem; }
   .theme-sub { font-size: 0.85rem; color: var(--muted); margin: 0.2rem 0 1rem; line-height: 1.45; }
   .theme-pro-badge { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em; color: #2b1200; background: linear-gradient(135deg, #fb7915, #d1600a); padding: 0.1rem 0.4rem; border-radius: 999px; vertical-align: middle; margin-left: 0.35rem; }
   .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
@@ -658,6 +671,7 @@
 <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.6a3.5 3.5 0 0 1 7 0v2.9"/></symbol>
 <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7.5 11l4.5 4.5L16.5 11M4.5 20h15"/></symbol>
 <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.2v2.4M12 18.4v2.4M20.8 12h-2.4M5.6 12H3.2M18.2 5.8l-1.7 1.7M7.5 16.5l-1.7 1.7M18.2 18.2l-1.7-1.7M7.5 7.5 5.8 5.8"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="3.8"/><path d="M4.6 20.4c.9-3.6 3.9-5.6 7.4-5.6s6.5 2 7.4 5.6"/></symbol>
 <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6 17 17M7 7 5.4 5.4"/></symbol>
 <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3.5 13.5h4l1.5 3h6l1.5-3h4"/><path d="M5.6 4.5h12.8l2.1 9v4a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2v-4z"/></symbol>
 <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.75L12 16.9l-5.2 2.7 1-5.75-4.2-4.1 5.8-.85z"/></symbol>
@@ -697,6 +711,7 @@
     </div>
     <div class="topbar-actions">
       <button class="icon-btn lockable" id="exportBtn" title="Exportar"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span class="mini-lock" id="exportLock"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg></span></button>
+      <button class="icon-btn" id="profileBtn" title="Seu perfil" aria-label="Seu perfil"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg></button>
       <button class="icon-btn settings-btn" id="settingsBtn" title="Personalizar tema"><svg class="ico" aria-hidden="true"><use href="#i-gear"/></svg></button>
     </div>
   </div>
@@ -980,6 +995,26 @@
       <button class="btn-ghost" id="aiResultClose">Fechar</button>
       <button class="btn-ghost" id="aiResultCopy">Copiar</button>
       <button class="btn" id="aiResultDone" style="display:none">Concluir tarefa</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PERFIL (pico de energia) -->
+<div class="overlay" id="profileOverlay">
+  <div class="modal modal-sm" role="dialog" aria-labelledby="pfTitle">
+    <h3 id="pfTitle">Seu perfil</h3>
+    <p class="theme-sub">O pico de energia é o horário que a agenda protege para o que é importante. Responda de novo ou ajuste na mão.</p>
+    <div class="pf-now"><span>Seu pico</span><b id="pfPreview">15h–22h</b></div>
+    <p class="pf-why" id="pfWhy"></p>
+    <div class="field"><label id="pfPeriodoLbl">Quando você rende melhor?</label><div class="pf-grid" id="pfPeriodo" role="radiogroup" aria-labelledby="pfPeriodoLbl"></div></div>
+    <div class="field"><label id="pfAcordaLbl">Num dia livre, sem despertador, que horas você acorda?</label><div class="pf-grid" id="pfAcorda" role="radiogroup" aria-labelledby="pfAcordaLbl"></div></div>
+    <div class="row">
+      <div class="field"><label for="pfIni">Começa às</label><select class="pf-sel" id="pfIni"></select></div>
+      <div class="field"><label for="pfFim">Termina às</label><select class="pf-sel" id="pfFim"></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="profileClose">Fechar</button>
+      <button class="btn" id="profileSave">Salvar pico</button>
     </div>
   </div>
 </div>
@@ -1392,6 +1427,90 @@
     TL_END = Math.max(23 * 60, PEAK_END);
     document.querySelectorAll(".peak-rot").forEach(el => { el.textContent = PEAK_LABEL; });
   }
+  // ---------- perfil: pico de energia ----------
+  // Espelho de definirPico (src/lib/product/matriz.ts): mudou lá, muda aqui.
+  const FAIXA_PICO = {
+    manha: { nome: "Manhã", de: 6, ate: 12, horas: 5, depois: 1, rende: "de manhã" },
+    tarde: { nome: "Tarde", de: 11, ate: 17, horas: 5, depois: 4, rende: "à tarde" },
+    "tarde-noite": { nome: "Tarde/Noite", de: 15, ate: 22, horas: 6, depois: 8, rende: "do fim da tarde à noite" },
+    madrugada: { nome: "Noite", de: 19, ate: 24, horas: 5, depois: 11, rende: "à noite" },
+  };
+  const ACORDA_PICO = {
+    "antes-6": { nome: "Antes das 6h", hora: 5, texto: "antes das 6h", periodo: "manha" },
+    "6-8": { nome: "6h–8h", hora: 7, texto: "entre 6h e 8h", periodo: "tarde" },
+    "8-10": { nome: "8h–10h", hora: 9, texto: "entre 8h e 10h", periodo: "tarde-noite" },
+    "depois-10": { nome: "Depois das 10h", hora: 11, texto: "depois das 10h", periodo: "madrugada" },
+  };
+  function definirPico(janela, acorda) {
+    const a = ACORDA_PICO[acorda] || null;
+    const f = FAIXA_PICO[janela] || (a && FAIXA_PICO[a.periodo]);
+    if (!f) return { inicio: PEAK_PADRAO.inicio, fim: PEAK_PADRAO.fim };
+    const inicio = Math.min(f.ate - f.horas, Math.max(f.de, (a ? a.hora : 7) + f.depois));
+    return { inicio: inicio, fim: inicio + f.horas };
+  }
+  let pf = null; // rascunho do perfil enquanto o modal está aberto
+  function openProfile() {
+    let onb = {};
+    try { onb = JSON.parse(localStorage.getItem("smartdayz:onboarding")) || {}; } catch (e) {}
+    const atual = store.peak || {};
+    pf = {
+      janela: atual.janela || onb.janela || null,
+      acorda: atual.acorda || onb.acorda || null,
+      inicio: PEAK_START / 60, fim: PEAK_END / 60,
+    };
+    renderProfile();
+    $("#profileOverlay").classList.add("open");
+  }
+  function closeProfile() { $("#profileOverlay").classList.remove("open"); }
+  function renderProfile() {
+    const opt = (grupo, id, nome, sub, on, wide) =>
+      '<button type="button" role="radio" aria-checked="' + on + '" class="pf-opt' + (on ? " on" : "") + (wide ? " wide" : "") + '" data-grupo="' + grupo + '" data-id="' + id + '">' +
+      nome + (sub ? "<small>" + sub + "</small>" : "") + "</button>";
+    $("#pfPeriodo").innerHTML = Object.keys(FAIXA_PICO).map(k => {
+      const f = FAIXA_PICO[k];
+      return opt("janela", k, f.nome, f.de + "h–" + f.ate + "h", pf.janela === k);
+    }).join("") + opt("janela", "nao-sei", "Não sei", "", pf.janela === "nao-sei", true);
+    $("#pfAcorda").innerHTML = Object.keys(ACORDA_PICO).map(k => opt("acorda", k, ACORDA_PICO[k].nome, "", pf.acorda === k))
+      .join("") + opt("acorda", "nao-sei", "Não sei", "", pf.acorda === "nao-sei", true);
+    const horas = (de, ate) => { let h = ""; for (let i = de; i <= ate; i++) h += '<option value="' + i + '">' + i + "h</option>"; return h; };
+    $("#pfIni").innerHTML = horas(5, 23); $("#pfIni").value = String(pf.inicio);
+    $("#pfFim").innerHTML = horas(pf.inicio + 1, 24); $("#pfFim").value = String(pf.fim);
+    $("#pfPreview").textContent = pf.inicio + "h–" + pf.fim + "h";
+    const f = FAIXA_PICO[pf.janela], a = ACORDA_PICO[pf.acorda];
+    const partes = [f ? "você rende melhor " + f.rende : "", a ? "acorda " + a.texto : ""].filter(Boolean);
+    const calc = definirPico(pf.janela, pf.acorda);
+    const naMao = calc.inicio !== pf.inicio || calc.fim !== pf.fim;
+    $("#pfWhy").textContent = naMao ? "Ajustado na mão." : partes.length
+      ? "Como " + partes.join(" e ") + ", é aqui que a agenda guarda o que é importante."
+      : "Sem as respostas, a agenda usa o horário padrão.";
+  }
+  function saveProfile() {
+    store.peak = { inicio: pf.inicio, fim: pf.fim, janela: pf.janela, acorda: pf.acorda };
+    applyPeak();
+    save();
+    closeProfile();
+    render();
+  }
+  $("#pfPeriodo").addEventListener("click", pfPick);
+  $("#pfAcorda").addEventListener("click", pfPick);
+  function pfPick(e) {
+    const b = e.target.closest(".pf-opt"); if (!b) return;
+    pf[b.dataset.grupo] = b.dataset.id;
+    const p = definirPico(pf.janela, pf.acorda);
+    pf.inicio = p.inicio; pf.fim = p.fim;
+    renderProfile();
+  }
+  $("#pfIni").addEventListener("change", (e) => {
+    pf.inicio = +e.target.value;
+    if (pf.fim <= pf.inicio) pf.fim = Math.min(24, pf.inicio + 5);
+    renderProfile();
+  });
+  $("#pfFim").addEventListener("change", (e) => { pf.fim = +e.target.value; renderProfile(); });
+  $("#profileBtn").addEventListener("click", openProfile);
+  $("#profileClose").addEventListener("click", closeProfile);
+  $("#profileSave").addEventListener("click", saveProfile);
+  $("#profileOverlay").addEventListener("click", (e) => { if (e.target === $("#profileOverlay")) closeProfile(); });
+
   function inPeak(t) { const m = timeToMin(t); return m !== null && m >= PEAK_START && m <= PEAK_END; }
   // duração assumida de uma atividade COM horário: 2h se começa dentro do pico, 1h fora.
   function durationMin(item) { return (item && item.time && inPeak(item.time)) ? 120 : 60; }
@@ -2605,7 +2724,7 @@
   $("#pwPass").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); pwAuth(); } });
   $("#paywallOverlay").addEventListener("click", (e) => { if (e.target === $("#paywallOverlay")) closePaywall(); });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { closeModal(); closeCtxModal(); closeThemeModal(); closeExportModal(); closeMoveModal(); closePaywall(); $("#upsellOverlay").classList.remove("open"); }
+    if (e.key === "Escape") { closeProfile(); closeModal(); closeCtxModal(); closeThemeModal(); closeExportModal(); closeMoveModal(); closePaywall(); $("#upsellOverlay").classList.remove("open"); }
     if (e.key === "Enter" && $("#overlay").classList.contains("open") && e.target.tagName !== "TEXTAREA") saveItem();
   });
   // inbox como dropzone (devolver pra "a classificar")

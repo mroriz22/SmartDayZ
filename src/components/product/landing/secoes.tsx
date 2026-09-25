@@ -151,7 +151,7 @@ const DUVIDAS = [
   },
   {
     p: "O que é o pico de energia?",
-    r: "É a janela do dia em que você rende mais, e o SmartDayZ reserva esse horário para o que é importante. Ela sai das suas respostas no começo: quando você rende melhor e que horas acorda. A agenda destaca esse intervalo e aponta quando algo importante ficou fora dele.",
+    r: "É a janela do dia em que você rende mais, e o SmartDayZ reserva esse horário para o que é importante. Ela sai das suas respostas no começo: quando você rende melhor e que horas acorda. A agenda destaca esse intervalo, aponta quando algo importante ficou fora dele, e você muda o horário no seu perfil quando quiser.",
   },
   {
     p: "O que acontece se meu dia mudar?",

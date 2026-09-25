@@ -4,7 +4,15 @@ import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { trackClient } from "@/factory/useAccess";
 import { Check, Logo, botao } from "@/components/product/landing/lp-ui";
-import { ORDEM_QUADRANTES, QUADRANTES, quadrante, rotuloPico, type HoraAcorda } from "@/lib/product/matriz";
+import {
+  FAIXA,
+  NAO_SEI,
+  ORDEM_QUADRANTES,
+  QUADRANTES,
+  quadrante,
+  rotuloPico,
+  type RespostaAcorda,
+} from "@/lib/product/matriz";
 import {
   NOME_CONTEXTO,
   lerRespostas,
@@ -26,33 +34,38 @@ import {
 
 const TOTAL = 7;
 
+const hh = (h: number) => `${h}h`;
+
 const JANELAS: { id: Janela; nome: string; horas: string }[] = [
-  { id: "manha", nome: "Manhã", horas: "6h–11h" },
-  { id: "tarde", nome: "Tarde", horas: "11h–15h" },
-  { id: "tarde-noite", nome: "Tarde/Noite", horas: "15h–22h" },
-  { id: "madrugada", nome: "Madrugada", horas: "Após 22h" },
+  { id: "manha", nome: "Manhã", horas: `${hh(FAIXA.manha.de)}–${hh(FAIXA.manha.ate)}` },
+  { id: "tarde", nome: "Tarde", horas: `${hh(FAIXA.tarde.de)}–${hh(FAIXA.tarde.ate)}` },
+  { id: "tarde-noite", nome: "Tarde/Noite", horas: `${hh(FAIXA["tarde-noite"].de)}–${hh(FAIXA["tarde-noite"].ate)}` },
+  { id: "madrugada", nome: "Noite", horas: `${hh(FAIXA.madrugada.de)}–${hh(FAIXA.madrugada.ate)}` },
+  { id: NAO_SEI, nome: "Não sei", horas: "A agenda usa o horário em que você acorda" },
 ];
-const ACORDA: { id: HoraAcorda; nome: string; texto: string }[] = [
+const ACORDA: { id: RespostaAcorda; nome: string; texto: string }[] = [
   { id: "antes-6", nome: "Antes das 6h", texto: "antes das 6h" },
   { id: "6-8", nome: "6h–8h", texto: "entre 6h e 8h" },
   { id: "8-10", nome: "8h–10h", texto: "entre 8h e 10h" },
   { id: "depois-10", nome: "Depois das 10h", texto: "depois das 10h" },
+  { id: NAO_SEI, nome: "Não sei", texto: "" },
 ];
 
-const RENDE: Record<Janela, string> = {
+const RENDE: Record<Exclude<Janela, typeof NAO_SEI>, string> = {
   manha: "de manhã",
   tarde: "à tarde",
   "tarde-noite": "do fim da tarde à noite",
-  madrugada: "tarde da noite",
+  madrugada: "à noite",
 };
 
 /** Por que o pico ficou onde ficou, com as palavras das respostas. */
-function motivoDoPico(janela: Janela | null, acorda: HoraAcorda | null) {
+function motivoDoPico(janela: Janela | null, acorda: RespostaAcorda | null) {
   const partes = [
-    janela ? `você rende melhor ${RENDE[janela]}` : "",
-    acorda ? `acorda ${ACORDA.find((a) => a.id === acorda)!.texto}` : "",
+    janela && janela !== NAO_SEI ? `você rende melhor ${RENDE[janela]}` : "",
+    acorda && acorda !== NAO_SEI ? `acorda ${ACORDA.find((a) => a.id === acorda)!.texto}` : "",
   ].filter(Boolean);
-  return partes.length ? `Como ${partes.join(" e ")}, é aqui que a agenda guarda o que é importante.` : "";
+  if (!partes.length) return "Sem as respostas, a agenda começa neste horário. Você muda o pico no seu perfil quando quiser.";
+  return `Como ${partes.join(" e ")}, é aqui que a agenda guarda o que é importante. Dá para mudar no seu perfil.`;
 }
 
 const CONTEXTOS: { id: Contexto; sigla: string; texto: string }[] = [
@@ -196,6 +209,8 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
   }
 
   const perfilRespondido = !!(r.janela || r.acorda);
+  // o pico precisa das duas respostas ("Não sei" conta) antes de seguir
+  const faltaPerfil = tela === 2 && (!r.janela || !r.acorda);
   const dia = montarDia(r.tarefas.length ? r.tarefas : EXEMPLO_DIA, pico);
   const primeiraNoPico = dia.find((t) => t.hora);
   const alvoRascunho = quadrante(rascunho.urgente, rascunho.importante);
@@ -212,7 +227,7 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
           <p className="justify-self-center text-sm text-body" aria-live="polite">
             {tela <= TOTAL ? `${tela} / ${TOTAL}` : ""}
           </p>
-          {tela < TOTAL ? (
+          {tela < TOTAL && tela !== 2 ? (
             <button
               type="button"
               onClick={() => setTela(tela + 1)}
@@ -239,7 +254,7 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
                 Seu dia, com direção.
               </h1>
               <p className="mt-2.5 text-[16px] leading-relaxed text-body">
-                Quatro passos curtos e seu primeiro dia fica montado. Você pode pular qualquer um.
+                Quatro passos curtos e seu primeiro dia fica montado. Só o primeiro é obrigatório: é ele que acha o seu pico.
               </p>
               <label htmlFor={`${id}-nome`} className="mt-6 block text-[13px] font-medium text-navy">
                 Como quer ser chamado?
@@ -277,7 +292,7 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
               <Cabeca
                 passo="Passo 1 de 4"
                 titulo="Quando você rende melhor?"
-                texto="Com duas respostas a agenda encontra o seu pico de energia: o horário que ela protege para o que é importante."
+                texto="Com duas respostas a agenda encontra o seu pico de energia: o horário que ela protege para o que é importante. Se não souber, marque “Não sei”."
               />
               <div role="radiogroup" aria-label="Quando você rende melhor" className="mt-6 flex flex-col gap-2.5">
                 {JANELAS.map((j) => (
@@ -300,7 +315,7 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
                     role="radio"
                     aria-checked={r.acorda === a.id}
                     onClick={() => atualizar({ acorda: a.id })}
-                    className={`rounded-[10px] border-[1.5px] px-3 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${
+                    className={`${a.id === NAO_SEI ? "col-span-2 " : ""}rounded-[10px] border-[1.5px] px-3 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${
                       r.acorda === a.id ? "border-orange bg-orange-soft text-navy" : "border-line bg-white text-navy hover:border-navy/30"
                     }`}
                   >
@@ -316,7 +331,7 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
                     <p className="mt-1 text-[13px] leading-relaxed text-white/75">{motivoDoPico(r.janela, r.acorda)}</p>
                   </>
                 ) : (
-                  <p className="text-[13px] leading-relaxed text-white/75">Responda e o seu pico aparece aqui.</p>
+                  <p className="text-[13px] leading-relaxed text-white/75">Responda as duas perguntas e o seu pico aparece aqui.</p>
                 )}
               </div>
             </section>
@@ -553,7 +568,12 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
                 </button>
               ) : null}
               {tela < TOTAL ? (
-                <button type="button" onClick={avancar} className={`${botao.primario} flex-1`}>
+                <button
+                  type="button"
+                  onClick={avancar}
+                  disabled={faltaPerfil}
+                  className={`${botao.primario} flex-1 disabled:cursor-not-allowed disabled:opacity-50`}
+                >
                   Continuar
                 </button>
               ) : null}
