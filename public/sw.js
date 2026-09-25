@@ -6,7 +6,7 @@
 //  - Navegação: rede primeiro; sem rede, a cópia guardada (ou /app como reserva).
 //  - Ícones e manifest: cache primeiro.
 // Ao mudar a lista abaixo, suba a versão para limpar o cache antigo.
-const VERSION = "smartdayz-v1";
+const VERSION = "smartdayz-v2";
 const PRECACHE = [
   "/app",
   "/manifest.webmanifest",
