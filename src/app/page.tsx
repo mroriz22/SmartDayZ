@@ -1,5 +1,4 @@
 import { factoryConfig } from "@/factory/config";
-import { OnboardingVenda } from "@/components/onboarding-venda";
 import { Hero, SiteFooter, SiteNav } from "@/components/product/landing/site";
 import { ComoFunciona } from "@/components/product/landing/como-funciona";
 import {
@@ -13,7 +12,6 @@ import {
 export default function HomePage() {
   return (
     <div className="font-display flex flex-1 flex-col bg-canvas text-navy">
-      <OnboardingVenda />
       <SiteNav />
       <main className="flex flex-col">
         <Hero />
