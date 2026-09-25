@@ -24,16 +24,20 @@ e o que ficou no lugar. Regra: vale o que o app (`public/agenda.html`) faz hoje.
 
 ## Pico de energia
 - Desde 25/09/2026 o pico é de cada pessoa. O passo 1 pergunta quando ela rende melhor e, a
-  mais do design, que horas acorda num dia livre. As duas são obrigatórias (sem "Pular" nesse
-  passo), com a opção "Não sei" em cada uma. `definirPico` (`src/lib/product/matriz.ts`)
-  cruza as respostas e mostra o resultado na hora ("Seu pico 12h–17h").
-- Os horários dos cards mudaram para a faixa onde o pico pode cair: Manhã 6h–12h, Tarde
-  11h–17h, Tarde/Noite 15h–22h e Noite 19h–24h ("Madrugada / Após 22h" virou "Noite", porque
-  a agenda vai até 24h). O id gravado continua `madrugada`.
-- Os dois "Não sei" dão 15h–22h; só um deles, a outra resposta decide.
-- O pico vai para a agenda como `store.peak` (com as respostas) e sincroniza com a nuvem. No
-  app, o botão de perfil (ícone de pessoa, ao lado da engrenagem) refaz as perguntas ou
-  ajusta início e fim na mão. A conta está espelhada em `FAIXA_PICO` no agenda.html.
+  mais do design, "Meu dia começa às X e termina às Y" (termina ≤ começa = dia seguinte, então
+  um dia das 12h às 3h vale). As duas são obrigatórias (sem "Pular" nesse passo), com "Não sei"
+  em cada uma. `definirPico` (`src/lib/product/matriz.ts`) cruza as respostas e mostra o
+  resultado na hora ("Seu pico 22h–3h").
+- Cards: Manhã 6h–12h, Tarde 12h–17h, Tarde/Noite 17h–23h, Madrugada 23h–5h. O pico (5h) fica
+  dentro do card escolhido, recortado pelo dia da pessoa; se o card nem cabe no dia, vai para a
+  parte do dia mais perto dele. Só o período: o começo do card. Só o dia: 3h depois de começar.
+  Os dois "Não sei": 15h–22h.
+- Horários passam de 24 quando atravessam a meia-noite (`{ inicio: 22, fim: 27 }` = 22h–3h).
+  A agenda grava `store.peak` (com as respostas) e `store.day` (null = "Não sei"), e usa o dia
+  como janela da linha do tempo, do relatório e da ordem dos compromissos: para quem vai até
+  3h, 01:00 vem depois de 23:00 e conta como pico.
+- No app, o botão de perfil (ícone de pessoa, ao lado da engrenagem) refaz as perguntas ou
+  ajusta início e fim do pico na mão. A conta está espelhada em `FAIXA_PICO` no agenda.html.
 
 ## IA
 - O app não tem sugestão com **Aceitar / Editar / Recusar / desfazer**. A IA (Pro) escreve

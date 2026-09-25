@@ -1,7 +1,9 @@
 import {
   definirPico,
   quadrante,
-  type RespostaAcorda,
+  normalizarDia,
+  NAO_SEI,
+  type RespostaDia,
   type RespostaPeriodo,
   type Pico,
   type QuadId,
@@ -16,7 +18,7 @@ import {
  *   agenda, gravamos o store `agenda.v3` no formato que public/agenda.html lê.
  *   Com `updatedAt: 0`, qualquer agenda que já exista na nuvem vence o merge
  *   (o app guarda backup do local antes), então o onboarding nunca apaga dado.
- * - O pico sai do perfil (quando rende + quando acorda; "não sei" vale). Vai no store como
+ * - O pico sai do perfil (quando rende + o dia da pessoa; "não sei" vale). Vai no store como
  *   `peak`; se a agenda já existia, o app lê daqui (`pico`) e adota.
  */
 
@@ -37,7 +39,7 @@ export type RespostasOnboarding = {
   nome: string;
   email: string;
   janela: Janela | null;
-  acorda: RespostaAcorda | null;
+  dia: RespostaDia | null;
   contexto: Contexto | null;
   tarefas: TarefaOnboarding[];
 };
@@ -55,8 +57,13 @@ export type TarefaNoDia = TarefaOnboarding & {
   hora: string;
 };
 
-export function picoDoPerfil(r: Pick<RespostasOnboarding, "janela" | "acorda">): Pico {
-  return definirPico(r.janela ?? null, r.acorda ?? null);
+export function picoDoPerfil(r: Pick<RespostasOnboarding, "janela" | "dia">): Pico {
+  return definirPico(r.janela ?? null, r.dia ?? null);
+}
+
+/** O dia no formato da agenda (fim passa de 24 se atravessa a meia-noite), ou null. */
+export function diaDoPerfil(r: Pick<RespostasOnboarding, "dia">) {
+  return r.dia && r.dia !== NAO_SEI ? normalizarDia(r.dia) : null;
 }
 
 /** Monta o dia: o importante entra no pico em blocos de 2h; o resto fica sem hora, fora dele. */
@@ -68,7 +75,7 @@ export function montarDia(tarefas: TarefaOnboarding[], pico: Pico): TarefaNoDia[
     .sort((a, b) => peso[a.quad] - peso[b.quad])
     .map((t) => {
       if (!t.importante || proxima >= pico.fim) return { ...t, hora: "" };
-      const hora = `${String(proxima).padStart(2, "0")}:00`;
+      const hora = `${String(proxima % 24).padStart(2, "0")}:00`;
       proxima += 2;
       return { ...t, hora };
     });
@@ -76,7 +83,7 @@ export function montarDia(tarefas: TarefaOnboarding[], pico: Pico): TarefaNoDia[
 
 export function salvarRespostas(r: RespostasOnboarding & { concluidoEm?: string }) {
   try {
-    localStorage.setItem(CHAVE_ONBOARDING, JSON.stringify({ ...r, pico: picoDoPerfil(r) }));
+    localStorage.setItem(CHAVE_ONBOARDING, JSON.stringify({ ...r, pico: picoDoPerfil(r), diaAgenda: diaDoPerfil(r) }));
   } catch {
     /* modo anônimo ou armazenamento cheio: o fluxo segue sem guardar */
   }
@@ -123,7 +130,12 @@ function agendaTemConteudo(): boolean {
  * Grava o primeiro dia na agenda do aparelho. Devolve false (e não toca em
  * nada) quando já existe agenda com conteúdo aqui.
  */
-export function semearAgenda(contexto: Contexto | null, tarefas: TarefaOnboarding[], pico: Pico): boolean {
+export function semearAgenda(
+  contexto: Contexto | null,
+  tarefas: TarefaOnboarding[],
+  pico: Pico,
+  dia: { inicio: number; fim: number } | null,
+): boolean {
   if (agendaTemConteudo()) return false;
   const id = uid();
   const hoje = hojeISO();
@@ -147,6 +159,7 @@ export function semearAgenda(contexto: Contexto | null, tarefas: TarefaOnboardin
     data: { [id]: { events: [], tasks } },
     daysOff: [],
     peak: pico,
+    ...(dia ? { day: dia } : {}),
     updatedAt: 0,
   };
   try {

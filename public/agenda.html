@@ -1007,10 +1007,19 @@
     <div class="pf-now"><span>Seu pico</span><b id="pfPreview">15h–22h</b></div>
     <p class="pf-why" id="pfWhy"></p>
     <div class="field"><label id="pfPeriodoLbl">Quando você rende melhor?</label><div class="pf-grid" id="pfPeriodo" role="radiogroup" aria-labelledby="pfPeriodoLbl"></div></div>
-    <div class="field"><label id="pfAcordaLbl">Num dia livre, sem despertador, que horas você acorda?</label><div class="pf-grid" id="pfAcorda" role="radiogroup" aria-labelledby="pfAcordaLbl"></div></div>
-    <div class="row">
-      <div class="field"><label for="pfIni">Começa às</label><select class="pf-sel" id="pfIni"></select></div>
-      <div class="field"><label for="pfFim">Termina às</label><select class="pf-sel" id="pfFim"></select></div>
+    <div class="field"><label id="pfDiaLbl">Seu dia</label>
+      <div class="row" role="group" aria-labelledby="pfDiaLbl">
+        <div class="field"><label for="pfDiaIni">Começa às</label><select class="pf-sel" id="pfDiaIni"></select></div>
+        <div class="field"><label for="pfDiaFim">Termina às</label><select class="pf-sel" id="pfDiaFim"></select></div>
+      </div>
+      <p class="pf-why" id="pfDiaHint"></p>
+      <div class="pf-grid"><button type="button" role="radio" aria-checked="false" class="pf-opt wide" id="pfDiaNaoSei">Não sei</button></div>
+    </div>
+    <div class="field"><label>Ajuste fino do pico</label>
+      <div class="row">
+        <div class="field"><label for="pfIni">Começa às</label><select class="pf-sel" id="pfIni"></select></div>
+        <div class="field"><label for="pfFim">Termina às</label><select class="pf-sel" id="pfFim"></select></div>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn-ghost" id="profileClose">Fechar</button>
@@ -1052,12 +1061,12 @@
   const $ = (s) => document.querySelector(s);
 
   // ---------- eisenhower config ----------
-  // pico de energia da pessoa (minutos). Sai do perfil do onboarding (/quiz):
-  // store.peak, ou smartdayz:onboarding.pico se a agenda já existia. Sem perfil, 15h–22h.
+  // pico de energia e dia da pessoa (minutos). Saem do perfil do onboarding (/quiz):
+  // store.peak/store.day, ou smartdayz:onboarding se a agenda já existia. Sem perfil,
+  // pico 15h–22h e timeline 6h–23h. Fim > 24h = passa da meia-noite (27h = 3h).
   const PEAK_PADRAO = { inicio: 15, fim: 22 };
   let PEAK_START = 15 * 60, PEAK_END = 22 * 60, PEAK_LABEL = "15h–22h";
-  const TL_START = 6 * 60;                           // janela da timeline
-  let TL_END = 23 * 60;
+  let TL_START = 6 * 60, TL_END = 23 * 60;           // janela da timeline = o dia da pessoa
   const QUAD = {
     q1: { name: "Fazer agora", tag: "1", sub: "Urgente + Importante", color: "var(--q1)", important: true, tip: "Crítico — encaixe no pico se exigir cabeça" },
     q2: { name: "Planejar", tag: "2", sub: "Importante + Não urgente", color: "var(--q2)", important: true, get tip() { return "Onde mora o que muda o jogo — proteja o pico " + PEAK_LABEL; } },
@@ -1413,7 +1422,14 @@
 
   function timeToMin(t) { if (!t) return null; const [h, m] = t.split(":").map(Number); return h * 60 + m; }
   function validPeak(p) {
-    return p && Number.isInteger(p.inicio) && Number.isInteger(p.fim) && p.inicio >= 0 && p.fim <= 24 && p.inicio < p.fim ? p : null;
+    return p && Number.isInteger(p.inicio) && Number.isInteger(p.fim) && p.inicio >= 0 && p.inicio < 24 && p.inicio < p.fim && p.fim - p.inicio <= 24 ? p : null;
+  }
+  function horaRot(h) { return (h === 24 ? 24 : h % 24) + "h"; }
+  // horário do item no "dia da pessoa": quem vai até 3h tem 01:00 depois das 23:00
+  function extMin(m) { return m !== null && TL_END > 1440 && m < TL_START ? m + 1440 : m; }
+  function timeSort(a, b) {
+    const k = (x) => (x.time ? extMin(timeToMin(x.time)) : 1e9);
+    return k(a) - k(b);
   }
   function applyPeak() {
     let p = validPeak(store.peak);
@@ -1423,95 +1439,133 @@
       if (p) store.peak = { inicio: p.inicio, fim: p.fim };
     }
     p = p || PEAK_PADRAO;
-    PEAK_START = p.inicio * 60; PEAK_END = p.fim * 60; PEAK_LABEL = p.inicio + "h–" + p.fim + "h";
-    TL_END = Math.max(23 * 60, PEAK_END);
+    let dia = validPeak(store.day);
+    // null = a pessoa disse "Não sei" no perfil; só sem nada gravado vale o do onboarding
+    if (!dia && store.day === undefined) {
+      try { dia = validPeak((JSON.parse(localStorage.getItem("smartdayz:onboarding")) || {}).diaAgenda); } catch (e) {}
+      if (dia) store.day = { inicio: dia.inicio, fim: dia.fim };
+    }
+    PEAK_START = p.inicio * 60; PEAK_END = p.fim * 60; PEAK_LABEL = horaRot(p.inicio) + "–" + horaRot(p.fim);
+    if (dia) {
+      // pico que cai "antes" do dia começar é o da madrugada seguinte
+      if (PEAK_END <= dia.inicio * 60) { PEAK_START += 1440; PEAK_END += 1440; }
+      TL_START = Math.min(dia.inicio * 60, PEAK_START);
+      TL_END = Math.max(dia.fim * 60, PEAK_END);
+    } else {
+      TL_START = Math.min(6 * 60, PEAK_START);
+      TL_END = Math.max(23 * 60, PEAK_END);
+    }
     document.querySelectorAll(".peak-rot").forEach(el => { el.textContent = PEAK_LABEL; });
   }
   // ---------- perfil: pico de energia ----------
   // Espelho de definirPico (src/lib/product/matriz.ts): mudou lá, muda aqui.
   const FAIXA_PICO = {
-    manha: { nome: "Manhã", de: 6, ate: 12, horas: 5, depois: 1, rende: "de manhã" },
-    tarde: { nome: "Tarde", de: 11, ate: 17, horas: 5, depois: 4, rende: "à tarde" },
-    "tarde-noite": { nome: "Tarde/Noite", de: 15, ate: 22, horas: 6, depois: 8, rende: "do fim da tarde à noite" },
-    madrugada: { nome: "Noite", de: 19, ate: 24, horas: 5, depois: 11, rende: "à noite" },
+    manha: { nome: "Manhã", de: 6, ate: 12, rende: "de manhã" },
+    tarde: { nome: "Tarde", de: 12, ate: 17, rende: "à tarde" },
+    "tarde-noite": { nome: "Tarde/Noite", de: 17, ate: 23, rende: "do fim da tarde à noite" },
+    madrugada: { nome: "Madrugada", de: 23, ate: 29, rende: "de madrugada" },
   };
-  const ACORDA_PICO = {
-    "antes-6": { nome: "Antes das 6h", hora: 5, texto: "antes das 6h", periodo: "manha" },
-    "6-8": { nome: "6h–8h", hora: 7, texto: "entre 6h e 8h", periodo: "tarde" },
-    "8-10": { nome: "8h–10h", hora: 9, texto: "entre 8h e 10h", periodo: "tarde-noite" },
-    "depois-10": { nome: "Depois das 10h", hora: 11, texto: "depois das 10h", periodo: "madrugada" },
-  };
-  function definirPico(janela, acorda) {
-    const a = ACORDA_PICO[acorda] || null;
-    const f = FAIXA_PICO[janela] || (a && FAIXA_PICO[a.periodo]);
-    if (!f) return { inicio: PEAK_PADRAO.inicio, fim: PEAK_PADRAO.fim };
-    const inicio = Math.min(f.ate - f.horas, Math.max(f.de, (a ? a.hora : 7) + f.depois));
-    return { inicio: inicio, fim: inicio + f.horas };
+  const HORAS_PICO = 5, DIA_PADRAO = { inicio: 7, fim: 23 };
+  function normDia(r) { return { inicio: r.comeca, fim: r.termina <= r.comeca ? r.termina + 24 : r.termina }; }
+  function definirPico(janela, dia) {
+    const f0 = FAIXA_PICO[janela] || null;
+    const temDia = dia && dia !== "nao-sei";
+    if (!f0 && !temDia) return { inicio: PEAK_PADRAO.inicio, fim: PEAK_PADRAO.fim };
+    if (f0 && !temDia) return { inicio: f0.de, fim: f0.de + HORAS_PICO };
+    const d = temDia ? normDia(dia) : DIA_PADRAO;
+    const horas = Math.min(HORAS_PICO, d.fim - d.inicio);
+    const cabe = (i) => Math.min(d.fim - horas, Math.max(d.inicio, i));
+    let inicio;
+    if (!f0) inicio = cabe(d.inicio + 3);
+    else {
+      const sobra = (f) => Math.min(f.ate, d.fim) - Math.max(f.de, d.inicio);
+      const f = [0, 24, -24].map(k => ({ de: f0.de + k, ate: f0.ate + k })).reduce((m, x) => (sobra(x) > sobra(m) ? x : m));
+      inicio = cabe(Math.max(f.de, d.inicio));
+    }
+    const k = inicio >= 24 ? 24 : inicio < 0 ? -24 : 0;
+    return { inicio: inicio - k, fim: inicio - k + horas };
   }
   let pf = null; // rascunho do perfil enquanto o modal está aberto
   function openProfile() {
     let onb = {};
     try { onb = JSON.parse(localStorage.getItem("smartdayz:onboarding")) || {}; } catch (e) {}
     const atual = store.peak || {};
+    const dia = atual.dia !== undefined ? atual.dia : onb.dia;
     pf = {
       janela: atual.janela || onb.janela || null,
-      acorda: atual.acorda || onb.acorda || null,
-      inicio: PEAK_START / 60, fim: PEAK_END / 60,
+      dia: dia === "nao-sei" || (dia && Number.isInteger(dia.comeca) && Number.isInteger(dia.termina)) ? dia : null,
+      inicio: store.peak ? store.peak.inicio : PEAK_START / 60 % 24,
+      fim: store.peak ? store.peak.fim : PEAK_END / 60 - (PEAK_START >= 1440 ? 24 : 0),
     };
     renderProfile();
     $("#profileOverlay").classList.add("open");
   }
   function closeProfile() { $("#profileOverlay").classList.remove("open"); }
   function renderProfile() {
-    const opt = (grupo, id, nome, sub, on, wide) =>
-      '<button type="button" role="radio" aria-checked="' + on + '" class="pf-opt' + (on ? " on" : "") + (wide ? " wide" : "") + '" data-grupo="' + grupo + '" data-id="' + id + '">' +
+    const opt = (id, nome, sub, on, wide) =>
+      '<button type="button" role="radio" aria-checked="' + on + '" class="pf-opt' + (on ? " on" : "") + (wide ? " wide" : "") + '" data-id="' + id + '">' +
       nome + (sub ? "<small>" + sub + "</small>" : "") + "</button>";
     $("#pfPeriodo").innerHTML = Object.keys(FAIXA_PICO).map(k => {
       const f = FAIXA_PICO[k];
-      return opt("janela", k, f.nome, f.de + "h–" + f.ate + "h", pf.janela === k);
-    }).join("") + opt("janela", "nao-sei", "Não sei", "", pf.janela === "nao-sei", true);
-    $("#pfAcorda").innerHTML = Object.keys(ACORDA_PICO).map(k => opt("acorda", k, ACORDA_PICO[k].nome, "", pf.acorda === k))
-      .join("") + opt("acorda", "nao-sei", "Não sei", "", pf.acorda === "nao-sei", true);
-    const horas = (de, ate) => { let h = ""; for (let i = de; i <= ate; i++) h += '<option value="' + i + '">' + i + "h</option>"; return h; };
-    $("#pfIni").innerHTML = horas(5, 23); $("#pfIni").value = String(pf.inicio);
-    $("#pfFim").innerHTML = horas(pf.inicio + 1, 24); $("#pfFim").value = String(pf.fim);
-    $("#pfPreview").textContent = pf.inicio + "h–" + pf.fim + "h";
-    const f = FAIXA_PICO[pf.janela], a = ACORDA_PICO[pf.acorda];
-    const partes = [f ? "você rende melhor " + f.rende : "", a ? "acorda " + a.texto : ""].filter(Boolean);
-    const calc = definirPico(pf.janela, pf.acorda);
+      return opt(k, f.nome, horaRot(f.de) + "–" + horaRot(f.ate % 24), pf.janela === k);
+    }).join("") + opt("nao-sei", "Não sei", "", pf.janela === "nao-sei", true);
+    const horas = (sel) => { let h = '<option value="">--</option>'; for (let i = 0; i < 24; i++) h += '<option value="' + i + '">' + i + "h</option>"; $(sel).innerHTML = h; };
+    ["#pfDiaIni", "#pfDiaFim", "#pfIni", "#pfFim"].forEach(horas);
+    const temDia = pf.dia && pf.dia !== "nao-sei";
+    $("#pfDiaIni").value = temDia ? String(pf.dia.comeca) : (pf.diaRasc && pf.diaRasc.comeca != null ? String(pf.diaRasc.comeca) : "");
+    $("#pfDiaFim").value = temDia ? String(pf.dia.termina) : (pf.diaRasc && pf.diaRasc.termina != null ? String(pf.diaRasc.termina) : "");
+    $("#pfDiaNaoSei").classList.toggle("on", pf.dia === "nao-sei");
+    $("#pfDiaNaoSei").setAttribute("aria-checked", String(pf.dia === "nao-sei"));
+    $("#pfDiaHint").textContent = temDia && pf.dia.termina <= pf.dia.comeca
+      ? "Termina às " + pf.dia.termina + "h do dia seguinte."
+      : "Pode passar da meia-noite: começa ao meio-dia e termina às 3h, por exemplo.";
+    $("#pfIni").value = String(pf.inicio % 24); $("#pfFim").value = String(pf.fim % 24);
+    $("#pfPreview").textContent = horaRot(pf.inicio) + "–" + horaRot(pf.fim);
+    const f = FAIXA_PICO[pf.janela];
+    const partes = [temDia ? "seu dia vai das " + pf.dia.comeca + "h às " + pf.dia.termina + "h" : "", f ? "você rende melhor " + f.rende : ""].filter(Boolean);
+    const calc = definirPico(pf.janela, pf.dia);
     const naMao = calc.inicio !== pf.inicio || calc.fim !== pf.fim;
     $("#pfWhy").textContent = naMao ? "Ajustado na mão." : partes.length
       ? "Como " + partes.join(" e ") + ", é aqui que a agenda guarda o que é importante."
       : "Sem as respostas, a agenda usa o horário padrão.";
   }
+  function recalcular() { const p = definirPico(pf.janela, pf.dia); pf.inicio = p.inicio; pf.fim = p.fim; renderProfile(); }
   function saveProfile() {
-    store.peak = { inicio: pf.inicio, fim: pf.fim, janela: pf.janela, acorda: pf.acorda };
+    store.peak = { inicio: pf.inicio, fim: pf.fim, janela: pf.janela, dia: pf.dia };
+    store.day = pf.dia && pf.dia !== "nao-sei" ? normDia(pf.dia) : null;
     applyPeak();
     save();
     closeProfile();
     render();
   }
-  $("#pfPeriodo").addEventListener("click", pfPick);
-  $("#pfAcorda").addEventListener("click", pfPick);
-  function pfPick(e) {
+  $("#pfPeriodo").addEventListener("click", (e) => {
     const b = e.target.closest(".pf-opt"); if (!b) return;
-    pf[b.dataset.grupo] = b.dataset.id;
-    const p = definirPico(pf.janela, pf.acorda);
-    pf.inicio = p.inicio; pf.fim = p.fim;
+    pf.janela = b.dataset.id; recalcular();
+  });
+  function pfDiaChange() {
+    const a = $("#pfDiaIni").value, b = $("#pfDiaFim").value;
+    pf.diaRasc = { comeca: a === "" ? null : +a, termina: b === "" ? null : +b };
+    pf.dia = a !== "" && b !== "" ? { comeca: +a, termina: +b } : null;
+    recalcular();
+  }
+  $("#pfDiaIni").addEventListener("change", pfDiaChange);
+  $("#pfDiaFim").addEventListener("change", pfDiaChange);
+  $("#pfDiaNaoSei").addEventListener("click", () => { pf.dia = "nao-sei"; pf.diaRasc = null; recalcular(); });
+  // ajuste fino: fim igual ou antes do início é no dia seguinte
+  function pfManual() {
+    const a = $("#pfIni").value, b = $("#pfFim").value;
+    if (a === "" || b === "") return;
+    pf.inicio = +a; pf.fim = +b <= +a ? +b + 24 : +b;
     renderProfile();
   }
-  $("#pfIni").addEventListener("change", (e) => {
-    pf.inicio = +e.target.value;
-    if (pf.fim <= pf.inicio) pf.fim = Math.min(24, pf.inicio + 5);
-    renderProfile();
-  });
-  $("#pfFim").addEventListener("change", (e) => { pf.fim = +e.target.value; renderProfile(); });
+  $("#pfIni").addEventListener("change", pfManual);
+  $("#pfFim").addEventListener("change", pfManual);
   $("#profileBtn").addEventListener("click", openProfile);
   $("#profileClose").addEventListener("click", closeProfile);
   $("#profileSave").addEventListener("click", saveProfile);
   $("#profileOverlay").addEventListener("click", (e) => { if (e.target === $("#profileOverlay")) closeProfile(); });
 
-  function inPeak(t) { const m = timeToMin(t); return m !== null && m >= PEAK_START && m <= PEAK_END; }
+  function inPeak(t) { const m = extMin(timeToMin(t)); return m !== null && m >= PEAK_START && m <= PEAK_END; }
   // duração assumida de uma atividade COM horário: 2h se começa dentro do pico, 1h fora.
   function durationMin(item) { return (item && item.time && inPeak(item.time)) ? 120 : 60; }
 
@@ -1619,14 +1673,15 @@
     tl.appendChild(zone);
 
     const hours = document.createElement("div"); hours.className = "tl-hours";
-    [6, 9, 12, 15, 18, 21].forEach(h => {
-      const s = document.createElement("span"); s.textContent = h + "h"; s.style.left = pct(h * 60) + "%"; hours.appendChild(s);
-    });
+    const passo = TL_END - TL_START > 20 * 60 ? 4 : 3;
+    for (let h = Math.ceil(TL_START / 60 / passo) * passo; h * 60 < TL_END; h += passo) {
+      const s = document.createElement("span"); s.textContent = (h % 24) + "h"; s.style.left = pct(h * 60) + "%"; hours.appendChild(s);
+    }
     tl.appendChild(hours);
 
     // barra da duração (atrás) + ponto do horário (na frente). Duração: 2h no pico, 1h fora.
     const drawItem = (item, isTask) => {
-      const m = timeToMin(item.time); if (m < TL_START || m > TL_END) return;
+      const m = extMin(timeToMin(item.time)); if (m < TL_START || m > TL_END) return;
       const cls = isImportant(item) ? "imp" : "norm";
       const dur = durationMin(item);
       const endM = Math.min(m + dur, TL_END);
@@ -1670,7 +1725,7 @@
       list.appendChild(banner);
     }
 
-    const evs = ctxData().events.filter(e => e.date === selected).sort((a, b) => (a.time || "99").localeCompare(b.time || "99"));
+    const evs = ctxData().events.filter(e => e.date === selected).sort(timeSort);
     // no painel do dia mostramos as ENTREGAS (tarefas geradas pelo prazo, ou legado com start===due).
     // a tarefa-mãe (start!==due) vive na matriz no dia de início, não aqui.
     const dayTasks = ctxData().tasks.filter(t => t.due === selected && (t.entrega || t.start === t.due));
@@ -2277,7 +2332,7 @@
     let body = "";
     dates.forEach(ds => {
       body += "<h2>" + escapeHTML(prettyDateFull(ds)) + "</h2><ul>";
-      byDate[ds].sort((a, b) => (a.time || "99").localeCompare(b.time || "99")).forEach(e => {
+      byDate[ds].sort(timeSort).forEach(e => {
         const peak = e.time && inPeak(e.time);
         body += '<li><span class="t">' + (e.time || "—") + "</span> " + escapeHTML(e.title) +
           (peak ? ' <span class="pk">pico</span>' : "") + (e.note ? '<div class="n">' + escapeHTML(e.note) + "</div>" : "") + "</li>";
@@ -2433,13 +2488,13 @@
       else { insight = "A maior parte do que muda o jogo está fora do pico. Reorganize pra ganhar tração."; cls = "bad"; }
 
       const pctLabel = d.pct === null ? "—" : d.pct + "%";
-      const hours = []; for (let h = 6; h <= 22; h++) hours.push(h);
-      const maxC = Math.max(1, ...hours.map(h => d.buckets[h] || 0));
+      const hours = []; for (let h = Math.floor(TL_START / 60); h * 60 < TL_END; h++) hours.push(h);
+      const maxC = Math.max(1, ...hours.map(h => d.buckets[h % 24] || 0));
       const bars = hours.map(h => {
-        const c = d.buckets[h] || 0;
+        const c = d.buckets[h % 24] || 0;
         const peak = h * 60 >= PEAK_START && h * 60 < PEAK_END;
         const hpx = c ? Math.max(Math.round((c / maxC) * 100), 10) : 0;
-        return '<div class="hb-col"><div class="hb' + (peak ? " peak" : "") + '" style="height:' + hpx + '%" title="' + h + 'h: ' + c + '"></div></div>';
+        return '<div class="hb-col"><div class="hb' + (peak ? " peak" : "") + '" style="height:' + hpx + '%" title="' + (h % 24) + 'h: ' + c + '"></div></div>';
       }).join("");
 
       html =
@@ -2455,7 +2510,7 @@
           '<div class="hist-wrap">' +
             '<div class="hist-label">Distribuição dos importantes por horário</div>' +
             '<div class="hist"><div class="hist-bars">' + bars + '</div>' +
-              '<div class="hist-axis"><span>6h</span><span>9h</span><span>12h</span><span>15h</span><span>18h</span><span>22h</span></div></div>' +
+              '<div class="hist-axis">' + [0, 0.2, 0.4, 0.6, 0.8, 1].map(f => '<span>' + (hours[Math.round(f * (hours.length - 1))] % 24) + 'h</span>').join("") + '</div></div>' +
           '</div>' +
           '<div class="summary">' +
             '<div class="sm"><b>' + d.importantCount + '</b>importantes</div>' +

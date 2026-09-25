@@ -11,12 +11,13 @@ import {
   QUADRANTES,
   quadrante,
   rotuloPico,
-  type RespostaAcorda,
+  type RespostaDia,
 } from "@/lib/product/matriz";
 import {
   NOME_CONTEXTO,
   lerRespostas,
   montarDia,
+  diaDoPerfil,
   picoDoPerfil,
   salvarRespostas,
   semearAgenda,
@@ -40,29 +41,26 @@ const JANELAS: { id: Janela; nome: string; horas: string }[] = [
   { id: "manha", nome: "Manhã", horas: `${hh(FAIXA.manha.de)}–${hh(FAIXA.manha.ate)}` },
   { id: "tarde", nome: "Tarde", horas: `${hh(FAIXA.tarde.de)}–${hh(FAIXA.tarde.ate)}` },
   { id: "tarde-noite", nome: "Tarde/Noite", horas: `${hh(FAIXA["tarde-noite"].de)}–${hh(FAIXA["tarde-noite"].ate)}` },
-  { id: "madrugada", nome: "Noite", horas: `${hh(FAIXA.madrugada.de)}–${hh(FAIXA.madrugada.ate)}` },
-  { id: NAO_SEI, nome: "Não sei", horas: "A agenda usa o horário em que você acorda" },
+  { id: "madrugada", nome: "Madrugada", horas: `${hh(FAIXA.madrugada.de)}–${hh(FAIXA.madrugada.ate % 24)}` },
+  { id: NAO_SEI, nome: "Não sei", horas: "A agenda usa o seu dia para achar o pico" },
 ];
-const ACORDA: { id: RespostaAcorda; nome: string; texto: string }[] = [
-  { id: "antes-6", nome: "Antes das 6h", texto: "antes das 6h" },
-  { id: "6-8", nome: "6h–8h", texto: "entre 6h e 8h" },
-  { id: "8-10", nome: "8h–10h", texto: "entre 8h e 10h" },
-  { id: "depois-10", nome: "Depois das 10h", texto: "depois das 10h" },
-  { id: NAO_SEI, nome: "Não sei", texto: "" },
-];
+const seletor =
+  "w-full rounded-[10px] border-[1.5px] border-line bg-white px-3 py-2.5 text-[15px] font-semibold text-navy outline-none focus:border-orange";
+
+const HORAS_DO_DIA = Array.from({ length: 24 }, (_, h) => h);
 
 const RENDE: Record<Exclude<Janela, typeof NAO_SEI>, string> = {
   manha: "de manhã",
   tarde: "à tarde",
   "tarde-noite": "do fim da tarde à noite",
-  madrugada: "à noite",
+  madrugada: "de madrugada",
 };
 
 /** Por que o pico ficou onde ficou, com as palavras das respostas. */
-function motivoDoPico(janela: Janela | null, acorda: RespostaAcorda | null) {
+function motivoDoPico(janela: Janela | null, dia: RespostaDia | null) {
   const partes = [
+    dia && dia !== NAO_SEI ? `seu dia vai das ${hh(dia.comeca)} às ${hh(dia.termina)}` : "",
     janela && janela !== NAO_SEI ? `você rende melhor ${RENDE[janela]}` : "",
-    acorda && acorda !== NAO_SEI ? `acorda ${ACORDA.find((a) => a.id === acorda)!.texto}` : "",
   ].filter(Boolean);
   if (!partes.length) return "Sem as respostas, a agenda começa neste horário. Você muda o pico no seu perfil quando quiser.";
   return `Como ${partes.join(" e ")}, é aqui que a agenda guarda o que é importante. Dá para mudar no seu perfil.`;
@@ -86,7 +84,7 @@ const MOTIVO: Record<string, string> = {
   q4: "Nem urgente, nem importante — fora do pico. Reavalie se precisa entrar.",
 };
 
-const vazio: RespostasOnboarding = { nome: "", email: "", janela: null, acorda: null, contexto: null, tarefas: [] };
+const vazio: RespostasOnboarding = { nome: "", email: "", janela: null, dia: null, contexto: null, tarefas: [] };
 
 function Escolha({
   selecionado,
@@ -161,11 +159,25 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
     const t = setTimeout(() => {
       const salvo = lerRespostas();
       if (salvo) setR((atual) => ({ ...atual, ...salvo, tarefas: salvo.tarefas ?? [] }));
+      if (salvo?.dia && salvo.dia !== NAO_SEI) setDiaRasc(salvo.dia);
     }, 0);
     return () => clearTimeout(t);
   }, []);
 
   const pico = picoDoPerfil(r);
+
+  // o dia só vale com as duas horas escolhidas; até lá fica no rascunho
+  const [diaRasc, setDiaRasc] = useState<{ comeca: number | null; termina: number | null }>({
+    comeca: null,
+    termina: null,
+  });
+  function escolherDia(parcial: { comeca?: number; termina?: number }) {
+    const novo = { ...diaRasc, ...parcial };
+    setDiaRasc(novo);
+    atualizar({
+      dia: novo.comeca !== null && novo.termina !== null ? { comeca: novo.comeca, termina: novo.termina } : null,
+    });
+  }
 
   function atualizar(parcial: Partial<RespostasOnboarding>) {
     setR((atual) => {
@@ -194,11 +206,11 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
   function concluir(plano: "gratuito" | "pro") {
     setTela(TOTAL + 1);
     salvarRespostas({ ...r, concluidoEm: new Date().toISOString() });
-    const semeou = semearAgenda(r.contexto, r.tarefas, pico);
+    const semeou = semearAgenda(r.contexto, r.tarefas, pico, diaDoPerfil(r));
     void trackClient("onboarding_concluido", {
       plano,
       janela: r.janela,
-      acorda: r.acorda,
+      dia: r.dia && r.dia !== NAO_SEI ? `${r.dia.comeca}-${r.dia.termina}` : r.dia,
       pico: rotuloPico(pico),
       contexto: r.contexto,
       tarefas: r.tarefas.length,
@@ -208,9 +220,9 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
     window.location.href = plano === "pro" ? `/login?modo=cadastro&${utm}` : "/app";
   }
 
-  const perfilRespondido = !!(r.janela || r.acorda);
+  const perfilRespondido = !!(r.janela || r.dia);
   // o pico precisa das duas respostas ("Não sei" conta) antes de seguir
-  const faltaPerfil = tela === 2 && (!r.janela || !r.acorda);
+  const faltaPerfil = tela === 2 && (!r.janela || !r.dia);
   const dia = montarDia(r.tarefas.length ? r.tarefas : EXEMPLO_DIA, pico);
   const primeiraNoPico = dia.find((t) => t.hora);
   const alvoRascunho = quadrante(rascunho.urgente, rascunho.importante);
@@ -304,31 +316,68 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
                   </Escolha>
                 ))}
               </div>
-              <p id={`${id}-acorda`} className="mt-6 text-[15px] font-semibold text-navy">
-                Num dia livre, sem despertador, que horas você acorda?
-              </p>
-              <div role="radiogroup" aria-labelledby={`${id}-acorda`} className="mt-2.5 grid grid-cols-2 gap-2">
-                {ACORDA.map((a) => (
-                  <button
-                    key={a.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={r.acorda === a.id}
-                    onClick={() => atualizar({ acorda: a.id })}
-                    className={`${a.id === NAO_SEI ? "col-span-2 " : ""}rounded-[10px] border-[1.5px] px-3 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${
-                      r.acorda === a.id ? "border-orange bg-orange-soft text-navy" : "border-line bg-white text-navy hover:border-navy/30"
-                    }`}
+              <p className="mt-6 text-[15px] font-semibold text-navy">E o seu dia, de que horas a que horas vai?</p>
+              <div className="mt-2.5 grid grid-cols-2 gap-2">
+                <label className="flex flex-col gap-1 text-[13px] font-medium text-navy">
+                  Meu dia começa às
+                  <select
+                    value={diaRasc.comeca ?? ""}
+                    onChange={(e) => escolherDia({ comeca: Number(e.target.value) })}
+                    className={seletor}
                   >
-                    {a.nome}
-                  </button>
-                ))}
+                    <option value="" disabled>
+                      --
+                    </option>
+                    {HORAS_DO_DIA.map((h) => (
+                      <option key={h} value={h}>
+                        {hh(h)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1 text-[13px] font-medium text-navy">
+                  e termina às
+                  <select
+                    value={diaRasc.termina ?? ""}
+                    onChange={(e) => escolherDia({ termina: Number(e.target.value) })}
+                    className={seletor}
+                  >
+                    <option value="" disabled>
+                      --
+                    </option>
+                    {HORAS_DO_DIA.map((h) => (
+                      <option key={h} value={h}>
+                        {hh(h)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
+              <p className="mt-1.5 text-[12px] text-body">
+                {diaRasc.comeca !== null && diaRasc.termina !== null && diaRasc.termina <= diaRasc.comeca
+                  ? `Termina às ${hh(diaRasc.termina)} do dia seguinte.`
+                  : "Pode passar da meia-noite: começa ao meio-dia e termina às 3h, por exemplo."}
+              </p>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={r.dia === NAO_SEI}
+                onClick={() => {
+                  setDiaRasc({ comeca: null, termina: null });
+                  atualizar({ dia: NAO_SEI });
+                }}
+                className={`mt-2.5 w-full rounded-[10px] border-[1.5px] px-3 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${
+                  r.dia === NAO_SEI ? "border-orange bg-orange-soft text-navy" : "border-line bg-white text-navy hover:border-navy/30"
+                }`}
+              >
+                Não sei
+              </button>
               <div className="mt-5 rounded-[12px] bg-navy px-4 py-3.5 text-white" aria-live="polite">
                 {perfilRespondido ? (
                   <>
                     <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-orange">Seu pico</p>
                     <p className="mt-0.5 text-[22px] font-extrabold tracking-[-0.02em]">{rotuloPico(pico)}</p>
-                    <p className="mt-1 text-[13px] leading-relaxed text-white/75">{motivoDoPico(r.janela, r.acorda)}</p>
+                    <p className="mt-1 text-[13px] leading-relaxed text-white/75">{motivoDoPico(r.janela, r.dia)}</p>
                   </>
                 ) : (
                   <p className="text-[13px] leading-relaxed text-white/75">Responda as duas perguntas e o seu pico aparece aqui.</p>
