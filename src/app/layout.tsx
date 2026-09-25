@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   title: `${appName} — seu dia, com direção`,
   description:
     "Organize tarefas, enxergue urgência e importância e monte o dia com a matriz de Eisenhower e o seu pico de energia. A decisão final é sempre sua.",
+  // PWA: o mesmo manifest do app (/app), para instalar também a partir da landing.
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: appName, statusBarStyle: "default" },
 };
 
 export default function RootLayout({
