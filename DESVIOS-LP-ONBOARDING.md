@@ -23,12 +23,13 @@ e o que ficou no lugar. Regra: vale o que o app (`public/agenda.html`) faz hoje.
   (grid de 1 coluna abaixo de 760px).
 
 ## Pico de energia
-- O app tem pico fixo **15h–22h** para todo mundo (`PEAK_START/PEAK_END`). O design
-  sugere "Tarde 11h–15h" e promete "Vamos proteger esse horário… Dá para ajustar depois".
-- A pergunta "Quando você rende melhor?" ficou (com as 4 opções literais) e a resposta é
-  guardada, mas o texto de apoio diz a verdade: hoje o pico é 15h–22h para todo mundo. O
-  selo "Sugerido" virou "Pico do app" e está em Tarde/Noite (15h–22h).
-- Tela 6/7 e card da landing usam o pico 15h–22h (tarefas às 15:00, 17:00…).
+- Desde 25/09/2026 o pico é de cada pessoa. O passo 1 pergunta quando ela rende melhor (as 4
+  opções do design, sem selo) e, a mais, que horas acorda num dia livre. `definirPico`
+  (`src/lib/product/matriz.ts`) cruza as duas e mostra o resultado na hora ("Seu pico 8h–13h").
+  O design não tinha a segunda pergunta.
+- O pico vai para a agenda como `store.peak` e sincroniza com a nuvem; se a agenda já
+  existia, o app adota o `pico` salvo em `smartdayz:onboarding`. Quem pula as duas
+  perguntas fica com 15h–22h. Ainda não há tela no app para mudar o pico depois.
 
 ## IA
 - O app não tem sugestão com **Aceitar / Editar / Recusar / desfazer**. A IA (Pro) escreve
@@ -55,7 +56,7 @@ e o que ficou no lugar. Regra: vale o que o app (`public/agenda.html`) faz hoje.
 
 ## Dúvidas
 - O PDF só traz a resposta da primeira pergunta. As outras quatro foram escritas a partir
-  do comportamento do app (IA não decide, pico 15h–22h, arrastar tarefa / prazo ≤ 2 dias
+  do comportamento do app (IA não decide, pico de cada pessoa, arrastar tarefa / prazo ≤ 2 dias
   vira urgente, cancelamento e teste).
 
 ## Rodapé

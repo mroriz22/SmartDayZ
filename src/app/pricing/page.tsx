@@ -9,7 +9,7 @@ export const metadata = {
 
 const INCLUI = [
   "Agenda e tarefas ilimitadas, com a matriz de cada dia",
-  "Aproveitamento do pico de energia das 15h às 22h",
+  "Aproveitamento do seu pico de energia, no horário em que você rende",
   "Relatório do dia, da semana e dos últimos 30 dias",
   "Sincronia entre computador e celular",
   "Agendas separadas: pessoal e trabalho",

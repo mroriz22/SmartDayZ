@@ -5,8 +5,8 @@ import { ORDEM_QUADRANTES, QUADRANTES, quadrante, type QuadId } from "@/lib/prod
 import { Eyebrow, SectionTitle } from "./lp-ui";
 
 const DICA: Record<QuadId, string> = {
-  q1: "Esta entrega vence amanhã e é importante. Vale colocá-la às 15h, no início do seu pico de energia, antes da revisão sem prazo?",
-  q2: "Sem prazo apertado, mas importa. Vale reservar um horário dentro do pico, das 15h às 22h, antes que vire urgência.",
+  q1: "Esta entrega vence amanhã e é importante. Vale colocá-la no início do seu pico de energia, antes da revisão sem prazo?",
+  q2: "Sem prazo apertado, mas importa. Vale reservar um horário dentro do seu pico antes que vire urgência.",
   q3: "Tem prazo, mas muda pouco para você. Vale passar para alguém ou negociar a data.",
   q4: "Nem urgente, nem importante. Vale tirar da lista de hoje e liberar o pico.",
 };

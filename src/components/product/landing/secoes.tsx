@@ -151,7 +151,7 @@ const DUVIDAS = [
   },
   {
     p: "O que é o pico de energia?",
-    r: "É a janela das 15h às 22h que o SmartDayZ reserva para o que é importante. A agenda destaca esse intervalo e aponta quando algo importante ficou fora dele. Por enquanto o horário é o mesmo para todo mundo.",
+    r: "É a janela do dia em que você rende mais, e o SmartDayZ reserva esse horário para o que é importante. Ela sai das suas respostas no começo: quando você rende melhor e que horas acorda. A agenda destaca esse intervalo e aponta quando algo importante ficou fora dele.",
   },
   {
     p: "O que acontece se meu dia mudar?",

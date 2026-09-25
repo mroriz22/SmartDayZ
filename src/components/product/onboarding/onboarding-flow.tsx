@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { trackClient } from "@/factory/useAccess";
 import { Check, Logo, botao } from "@/components/product/landing/lp-ui";
-import { ORDEM_QUADRANTES, PICO, QUADRANTES, quadrante } from "@/lib/product/matriz";
+import { ORDEM_QUADRANTES, QUADRANTES, quadrante, rotuloPico, type HoraAcorda } from "@/lib/product/matriz";
 import {
   NOME_CONTEXTO,
   lerRespostas,
   montarDia,
+  picoDoPerfil,
   salvarRespostas,
   semearAgenda,
   type Contexto,
@@ -31,8 +32,28 @@ const JANELAS: { id: Janela; nome: string; horas: string }[] = [
   { id: "tarde-noite", nome: "Tarde/Noite", horas: "15h–22h" },
   { id: "madrugada", nome: "Madrugada", horas: "Após 22h" },
 ];
-/** A janela que a agenda protege hoje (PICO). */
-const JANELA_SUGERIDA: Janela = "tarde-noite";
+const ACORDA: { id: HoraAcorda; nome: string; texto: string }[] = [
+  { id: "antes-6", nome: "Antes das 6h", texto: "antes das 6h" },
+  { id: "6-8", nome: "6h–8h", texto: "entre 6h e 8h" },
+  { id: "8-10", nome: "8h–10h", texto: "entre 8h e 10h" },
+  { id: "depois-10", nome: "Depois das 10h", texto: "depois das 10h" },
+];
+
+const RENDE: Record<Janela, string> = {
+  manha: "de manhã",
+  tarde: "à tarde",
+  "tarde-noite": "do fim da tarde à noite",
+  madrugada: "tarde da noite",
+};
+
+/** Por que o pico ficou onde ficou, com as palavras das respostas. */
+function motivoDoPico(janela: Janela | null, acorda: HoraAcorda | null) {
+  const partes = [
+    janela ? `você rende melhor ${RENDE[janela]}` : "",
+    acorda ? `acorda ${ACORDA.find((a) => a.id === acorda)!.texto}` : "",
+  ].filter(Boolean);
+  return partes.length ? `Como ${partes.join(" e ")}, é aqui que a agenda guarda o que é importante.` : "";
+}
 
 const CONTEXTOS: { id: Contexto; sigla: string; texto: string }[] = [
   { id: "pessoal", sigla: "P", texto: "Casa, saúde, estudos e compromissos seus." },
@@ -52,7 +73,7 @@ const MOTIVO: Record<string, string> = {
   q4: "Nem urgente, nem importante — fora do pico. Reavalie se precisa entrar.",
 };
 
-const vazio: RespostasOnboarding = { nome: "", email: "", janela: null, contexto: null, tarefas: [] };
+const vazio: RespostasOnboarding = { nome: "", email: "", janela: null, acorda: null, contexto: null, tarefas: [] };
 
 function Escolha({
   selecionado,
@@ -131,6 +152,8 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
     return () => clearTimeout(t);
   }, []);
 
+  const pico = picoDoPerfil(r);
+
   function atualizar(parcial: Partial<RespostasOnboarding>) {
     setR((atual) => {
       const novo = { ...atual, ...parcial };
@@ -158,10 +181,12 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
   function concluir(plano: "gratuito" | "pro") {
     setTela(TOTAL + 1);
     salvarRespostas({ ...r, concluidoEm: new Date().toISOString() });
-    const semeou = semearAgenda(r.contexto, r.tarefas);
+    const semeou = semearAgenda(r.contexto, r.tarefas, pico);
     void trackClient("onboarding_concluido", {
       plano,
       janela: r.janela,
+      acorda: r.acorda,
+      pico: rotuloPico(pico),
       contexto: r.contexto,
       tarefas: r.tarefas.length,
       agenda_criada: semeou,
@@ -170,7 +195,8 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
     window.location.href = plano === "pro" ? `/login?modo=cadastro&${utm}` : "/app";
   }
 
-  const dia = montarDia(r.tarefas.length ? r.tarefas : EXEMPLO_DIA);
+  const perfilRespondido = !!(r.janela || r.acorda);
+  const dia = montarDia(r.tarefas.length ? r.tarefas : EXEMPLO_DIA, pico);
   const primeiraNoPico = dia.find((t) => t.hora);
   const alvoRascunho = quadrante(rascunho.urgente, rascunho.importante);
   const alvoExemplo = quadrante(exUrg, exImp);
@@ -251,7 +277,7 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
               <Cabeca
                 passo="Passo 1 de 4"
                 titulo="Quando você rende melhor?"
-                texto={`Hoje a agenda protege o pico das ${PICO.rotulo} para o que é importante, para todo mundo. Sua resposta fica guardada com o seu perfil.`}
+                texto="Com duas respostas a agenda encontra o seu pico de energia: o horário que ela protege para o que é importante."
               />
               <div role="radiogroup" aria-label="Quando você rende melhor" className="mt-6 flex flex-col gap-2.5">
                 {JANELAS.map((j) => (
@@ -260,13 +286,38 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
                       <span className="block font-semibold text-navy">{j.nome}</span>
                       <span className="block text-[13px] text-body">{j.horas}</span>
                     </span>
-                    {j.id === JANELA_SUGERIDA ? (
-                      <span className="rounded-md bg-orange-soft px-2 py-0.5 text-[12px] font-medium text-orange-text ring-1 ring-orange/30">
-                        Pico do app
-                      </span>
-                    ) : null}
                   </Escolha>
                 ))}
+              </div>
+              <p id={`${id}-acorda`} className="mt-6 text-[15px] font-semibold text-navy">
+                Num dia livre, sem despertador, que horas você acorda?
+              </p>
+              <div role="radiogroup" aria-labelledby={`${id}-acorda`} className="mt-2.5 grid grid-cols-2 gap-2">
+                {ACORDA.map((a) => (
+                  <button
+                    key={a.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={r.acorda === a.id}
+                    onClick={() => atualizar({ acorda: a.id })}
+                    className={`rounded-[10px] border-[1.5px] px-3 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${
+                      r.acorda === a.id ? "border-orange bg-orange-soft text-navy" : "border-line bg-white text-navy hover:border-navy/30"
+                    }`}
+                  >
+                    {a.nome}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-5 rounded-[12px] bg-navy px-4 py-3.5 text-white" aria-live="polite">
+                {perfilRespondido ? (
+                  <>
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-orange">Seu pico</p>
+                    <p className="mt-0.5 text-[22px] font-extrabold tracking-[-0.02em]">{rotuloPico(pico)}</p>
+                    <p className="mt-1 text-[13px] leading-relaxed text-white/75">{motivoDoPico(r.janela, r.acorda)}</p>
+                  </>
+                ) : (
+                  <p className="text-[13px] leading-relaxed text-white/75">Responda e o seu pico aparece aqui.</p>
+                )}
               </div>
             </section>
           ) : null}
@@ -402,7 +453,7 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
               <Cabeca
                 passo="Passo 4 de 4"
                 titulo="Seu dia já tem direção."
-                texto={`O importante ficou dentro do seu pico (${PICO.rotulo}). O resto, fora dele. Tudo pode ser ajustado.`}
+                texto={`O importante ficou dentro do seu pico (${rotuloPico(pico)}). O resto, fora dele. Tudo pode ser ajustado.`}
               />
               <div className="mt-6 rounded-[14px] bg-navy p-4 text-white sm:p-5">
                 <div className="flex items-center justify-between text-[13px]">
@@ -410,7 +461,7 @@ export function OnboardingFlow({ trialDias }: { trialDias: number }) {
                     Hoje · {NOME_CONTEXTO[r.contexto ?? "pessoal"]}
                     {r.tarefas.length ? "" : " · exemplo"}
                   </span>
-                  <span className="text-white/70">Pico {PICO.rotulo}</span>
+                  <span className="text-white/70">Pico {rotuloPico(pico)}</span>
                 </div>
                 <ul className="mt-3 flex flex-col gap-2">
                   {dia.map((t, i) => (

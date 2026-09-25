@@ -1,7 +1,7 @@
 /**
  * A matriz de Eisenhower como o app (/app, public/agenda.html) mostra hoje.
  * Os nomes são os do design de 23/09/2026 e são os mesmos do const QUAD de lá;
- * o pico vem de PEAK_START/PEAK_END. Os ids (q1..q4) é que ficam gravados na
+ * o pico é o de cada pessoa (definirPico; lá, store.peak). Os ids (q1..q4) é que ficam gravados na
  * agenda — os nomes são só exibição, então trocar nome não quebra agenda salva.
  */
 
@@ -23,5 +23,50 @@ export function quadrante(urgente: boolean, importante: boolean): QuadId {
   return "q4";
 }
 
-/** Pico de energia fixo da agenda (15h–22h), igual para todo mundo por enquanto. */
-export const PICO = { inicio: 15, fim: 22, rotulo: "15h–22h" } as const;
+/** Janela de energia da pessoa, em horas cheias (fim exclusivo; vai até 24). */
+export type Pico = { inicio: number; fim: number };
+
+/** Só para quem pulou as perguntas do perfil: o pico que a agenda usava antes. */
+export const PICO_PADRAO: Pico = { inicio: 15, fim: 22 };
+
+export function rotuloPico(p: Pico) {
+  return `${p.inicio}h–${p.fim}h`;
+}
+
+export type PeriodoRende = "manha" | "tarde" | "tarde-noite" | "madrugada";
+export type HoraAcorda = "antes-6" | "6-8" | "8-10" | "depois-10";
+
+const HORA_ACORDA: Record<HoraAcorda, number> = {
+  "antes-6": 5,
+  "6-8": 7,
+  "8-10": 9,
+  "depois-10": 11,
+};
+
+/**
+ * Onde cai o pico de cada período: começa algumas horas depois de acordar,
+ * mas sem sair da faixa que a pessoa disse que rende.
+ */
+const FAIXA: Record<PeriodoRende, { depoisDeAcordar: number; min: number; max: number; horas: number }> = {
+  manha: { depoisDeAcordar: 1, min: 6, max: 8, horas: 5 },
+  tarde: { depoisDeAcordar: 4, min: 10, max: 12, horas: 5 },
+  "tarde-noite": { depoisDeAcordar: 8, min: 14, max: 17, horas: 6 },
+  madrugada: { depoisDeAcordar: 11, min: 18, max: 19, horas: 5 },
+};
+
+/** Sem a resposta de quando rende, o horário de acordar sugere o período. */
+const PERIODO_POR_ACORDA: Record<HoraAcorda, PeriodoRende> = {
+  "antes-6": "manha",
+  "6-8": "tarde",
+  "8-10": "tarde-noite",
+  "depois-10": "madrugada",
+};
+
+/** O pico da pessoa, a partir do perfil que ela respondeu no onboarding. */
+export function definirPico(periodo: PeriodoRende | null, acorda: HoraAcorda | null): Pico {
+  if (!periodo && !acorda) return PICO_PADRAO;
+  const faixa = FAIXA[periodo ?? PERIODO_POR_ACORDA[acorda!]];
+  const acordaAs = acorda ? HORA_ACORDA[acorda] : 7;
+  const inicio = Math.min(faixa.max, Math.max(faixa.min, acordaAs + faixa.depoisDeAcordar));
+  return { inicio, fim: Math.min(24, inicio + faixa.horas) };
+}

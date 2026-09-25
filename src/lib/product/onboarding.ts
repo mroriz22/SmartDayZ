@@ -1,4 +1,11 @@
-import { PICO, quadrante, type QuadId } from "./matriz";
+import {
+  definirPico,
+  quadrante,
+  type HoraAcorda,
+  type PeriodoRende,
+  type Pico,
+  type QuadId,
+} from "./matriz";
 
 /**
  * Persistência do onboarding (/quiz).
@@ -9,13 +16,15 @@ import { PICO, quadrante, type QuadId } from "./matriz";
  *   agenda, gravamos o store `agenda.v3` no formato que public/agenda.html lê.
  *   Com `updatedAt: 0`, qualquer agenda que já exista na nuvem vence o merge
  *   (o app guarda backup do local antes), então o onboarding nunca apaga dado.
+ * - O pico sai do perfil (quando rende + quando acorda). Vai no store como
+ *   `peak`; se a agenda já existia, o app lê daqui (`pico`) e adota.
  */
 
 export const CHAVE_ONBOARDING = "smartdayz:onboarding";
 const CHAVE_AGENDA = "agenda.v3";
 const CHAVES_ANTIGAS = ["agenda.v2", "agenda.v1"];
 
-export type Janela = "manha" | "tarde" | "tarde-noite" | "madrugada";
+export type Janela = PeriodoRende;
 export type Contexto = "pessoal" | "trabalho" | "meta";
 
 export type TarefaOnboarding = {
@@ -28,6 +37,7 @@ export type RespostasOnboarding = {
   nome: string;
   email: string;
   janela: Janela | null;
+  acorda: HoraAcorda | null;
   contexto: Contexto | null;
   tarefas: TarefaOnboarding[];
 };
@@ -45,15 +55,19 @@ export type TarefaNoDia = TarefaOnboarding & {
   hora: string;
 };
 
+export function picoDoPerfil(r: Pick<RespostasOnboarding, "janela" | "acorda">): Pico {
+  return definirPico(r.janela ?? null, r.acorda ?? null);
+}
+
 /** Monta o dia: o importante entra no pico em blocos de 2h; o resto fica sem hora, fora dele. */
-export function montarDia(tarefas: TarefaOnboarding[]): TarefaNoDia[] {
+export function montarDia(tarefas: TarefaOnboarding[], pico: Pico): TarefaNoDia[] {
   const peso: Record<QuadId, number> = { q1: 0, q2: 1, q3: 2, q4: 3 };
-  let proxima = PICO.inicio;
+  let proxima = pico.inicio;
   return tarefas
     .map((t) => ({ ...t, quad: quadrante(t.urgente, t.importante) }))
     .sort((a, b) => peso[a.quad] - peso[b.quad])
     .map((t) => {
-      if (!t.importante || proxima >= PICO.fim) return { ...t, hora: "" };
+      if (!t.importante || proxima >= pico.fim) return { ...t, hora: "" };
       const hora = `${String(proxima).padStart(2, "0")}:00`;
       proxima += 2;
       return { ...t, hora };
@@ -62,7 +76,7 @@ export function montarDia(tarefas: TarefaOnboarding[]): TarefaNoDia[] {
 
 export function salvarRespostas(r: RespostasOnboarding & { concluidoEm?: string }) {
   try {
-    localStorage.setItem(CHAVE_ONBOARDING, JSON.stringify(r));
+    localStorage.setItem(CHAVE_ONBOARDING, JSON.stringify({ ...r, pico: picoDoPerfil(r) }));
   } catch {
     /* modo anônimo ou armazenamento cheio: o fluxo segue sem guardar */
   }
@@ -109,11 +123,11 @@ function agendaTemConteudo(): boolean {
  * Grava o primeiro dia na agenda do aparelho. Devolve false (e não toca em
  * nada) quando já existe agenda com conteúdo aqui.
  */
-export function semearAgenda(contexto: Contexto | null, tarefas: TarefaOnboarding[]): boolean {
+export function semearAgenda(contexto: Contexto | null, tarefas: TarefaOnboarding[], pico: Pico): boolean {
   if (agendaTemConteudo()) return false;
   const id = uid();
   const hoje = hojeISO();
-  const tasks = montarDia(tarefas).map((t) => ({
+  const tasks = montarDia(tarefas, pico).map((t) => ({
     id: uid(),
     title: t.titulo,
     start: hoje,
@@ -132,6 +146,7 @@ export function semearAgenda(contexto: Contexto | null, tarefas: TarefaOnboardin
     active: id,
     data: { [id]: { events: [], tasks } },
     daysOff: [],
+    peak: pico,
     updatedAt: 0,
   };
   try {

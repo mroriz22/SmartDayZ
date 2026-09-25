@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SmartDayZ</title>
-<meta name="description" content="SmartDayZ — sua agenda com matriz de Eisenhower e cronobiologia: organize o dia protegendo seu pico de energia (15h-22h).">
+<meta name="description" content="SmartDayZ — sua agenda com matriz de Eisenhower e cronobiologia: organize o dia protegendo seu pico de energia.">
 <link rel="canonical" href="https://smartdayz.com/">
 <meta name="theme-color" content="#efe7d6">
 <meta property="og:type" content="website">
@@ -736,7 +736,7 @@
 
           <div class="chrono">
             <div class="chrono-legend">
-              <span class="lg"><span class="sw" style="background:var(--gold)"></span> Pico de energia 15h–22h</span>
+              <span class="lg"><span class="sw" style="background:var(--gold)"></span> Pico de energia <span class="peak-rot">15h–22h</span></span>
               <span class="lg"><span class="sw" style="background:var(--accent-2)"></span> Compromisso comum</span>
             </div>
             <div class="timeline" id="timeline"></div>
@@ -766,7 +766,7 @@
     </div>
     <p class="matrix-intro">
       Arraste (ou toque) cada atividade para o quadrante certo. <b>Importante</b> (vermelho/verde) puxa pro seu
-      <span style="color:var(--gold)">pico de energia 15h–22h</span> — sobretudo o quadrante <b>Planejar</b>, onde mora o trabalho que muda o jogo.
+      <span style="color:var(--gold)">pico de energia <span class="peak-rot">15h–22h</span></span> — sobretudo o quadrante <b>Planejar</b>, onde mora o trabalho que muda o jogo.
     </p>
 
     <div class="inbox" id="inbox" data-quad="none">
@@ -782,7 +782,7 @@
     <div class="report-head">
       <div>
         <h2 class="report-title">Aproveitamento do pico</h2>
-        <p class="report-sub">Quanto do seu trabalho importante (Fazer agora / Planejar) caiu no pico de energia 15h–22h.</p>
+        <p class="report-sub">Quanto do seu trabalho importante (Fazer agora / Planejar) caiu no pico de energia <span class="peak-rot">15h–22h</span>.</p>
         <p class="report-period" id="reportPeriod"></p>
       </div>
       <div class="report-controls">
@@ -816,7 +816,7 @@
         <div class="field"><label>Data</label><input type="date" id="evDate"></div>
         <div class="field">
           <label>Hora</label><input type="time" id="evTime">
-          <div class="hint" id="peakHint"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg> Dentro do seu pico de energia (15h–22h)</div>
+          <div class="hint" id="peakHint"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg> Dentro do seu pico de energia (<span class="peak-rot">15h–22h</span>)</div>
         </div>
       </div>
       <div class="field">
@@ -834,7 +834,7 @@
       <div class="ai-hint">Libera esta atividade pra qualquer quadrante da Matriz — menos Reavaliar — pra passar pra equipe ou mandar a IA resolver.</div>
       <button type="button" id="evResolveBtn" class="btn ai-resolve-btn" style="display:none">Resolver com IA agora</button>
       <button type="button" id="evSosBtn" class="sos-btn">SOS — emergência</button>
-      <div class="sos-hint">Use só pra emergência que precisa cair no pico (15h–22h) da agenda Pessoal.</div>
+      <div class="sos-hint">Use só pra emergência que precisa cair no pico (<span class="peak-rot">15h–22h</span>) da agenda Pessoal.</div>
     </div>
 
     <div id="formTask" style="display:none">
@@ -853,7 +853,7 @@
       <div class="field">
         <label>Hora</label>
         <input type="time" id="tkTime">
-        <div class="hint" id="tkPeakHint"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg> Dentro do seu pico de energia (15h–22h)</div>
+        <div class="hint" id="tkPeakHint"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg> Dentro do seu pico de energia (<span class="peak-rot">15h–22h</span>)</div>
       </div>
       <div class="field">
         <label>Classificação (marque uma, as duas, ou nenhuma)</label>
@@ -866,7 +866,7 @@
       <div class="ai-hint">Libera esta atividade pra qualquer quadrante da Matriz — menos Reavaliar — pra passar pra equipe ou mandar a IA resolver.</div>
       <button type="button" id="tkResolveBtn" class="btn ai-resolve-btn" style="display:none">Resolver com IA agora</button>
       <button type="button" id="tkSosBtn" class="sos-btn">SOS — emergência</button>
-      <div class="sos-hint">Use só pra emergência que precisa cair no pico (15h–22h) da agenda Pessoal.</div>
+      <div class="sos-hint">Use só pra emergência que precisa cair no pico (<span class="peak-rot">15h–22h</span>) da agenda Pessoal.</div>
     </div>
 
     <div class="form-msg" id="formMsg"></div>
@@ -1017,11 +1017,15 @@
   const $ = (s) => document.querySelector(s);
 
   // ---------- eisenhower config ----------
-  const PEAK_START = 15 * 60, PEAK_END = 22 * 60;   // minutos
-  const TL_START = 6 * 60, TL_END = 23 * 60;         // janela da timeline
+  // pico de energia da pessoa (minutos). Sai do perfil do onboarding (/quiz):
+  // store.peak, ou smartdayz:onboarding.pico se a agenda já existia. Sem perfil, 15h–22h.
+  const PEAK_PADRAO = { inicio: 15, fim: 22 };
+  let PEAK_START = 15 * 60, PEAK_END = 22 * 60, PEAK_LABEL = "15h–22h";
+  const TL_START = 6 * 60;                           // janela da timeline
+  let TL_END = 23 * 60;
   const QUAD = {
     q1: { name: "Fazer agora", tag: "1", sub: "Urgente + Importante", color: "var(--q1)", important: true, tip: "Crítico — encaixe no pico se exigir cabeça" },
-    q2: { name: "Planejar", tag: "2", sub: "Importante + Não urgente", color: "var(--q2)", important: true, tip: "Onde mora o que muda o jogo — proteja o pico 15h–22h" },
+    q2: { name: "Planejar", tag: "2", sub: "Importante + Não urgente", color: "var(--q2)", important: true, get tip() { return "Onde mora o que muda o jogo — proteja o pico " + PEAK_LABEL; } },
     q3: { name: "Delegar ou negociar", tag: "3", sub: "Urgente + Não importante", color: "var(--q3)", important: false, tip: "" },
     q4: { name: "Reavaliar", tag: "4", sub: "Nem urgente nem importante", color: "var(--q4)", important: false, tip: "" }
   };
@@ -1046,6 +1050,7 @@
 
   // ---------- state ----------
   let store = load();
+  applyPeak();
   let viewMonth = new Date(); viewMonth.setDate(1);
   let selected = iso(new Date());
   let formType = "event";
@@ -1265,6 +1270,7 @@
   function applyRemote(remote) {
     try { localStorage.setItem(BAK_KEY, JSON.stringify(store)); } catch (e) {}
     store = normalize(remote);
+    applyPeak();
     saveLocalOnly();
     selected = iso(new Date());
     render();
@@ -1371,8 +1377,23 @@
   const WEEKDAYS = ["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
 
   function timeToMin(t) { if (!t) return null; const [h, m] = t.split(":").map(Number); return h * 60 + m; }
+  function validPeak(p) {
+    return p && Number.isInteger(p.inicio) && Number.isInteger(p.fim) && p.inicio >= 0 && p.fim <= 24 && p.inicio < p.fim ? p : null;
+  }
+  function applyPeak() {
+    let p = validPeak(store.peak);
+    if (!p) {
+      try { p = validPeak((JSON.parse(localStorage.getItem("smartdayz:onboarding")) || {}).pico); } catch (e) {}
+      // adota o do perfil sem carimbar: sobe pra nuvem junto da próxima gravação
+      if (p) store.peak = { inicio: p.inicio, fim: p.fim };
+    }
+    p = p || PEAK_PADRAO;
+    PEAK_START = p.inicio * 60; PEAK_END = p.fim * 60; PEAK_LABEL = p.inicio + "h–" + p.fim + "h";
+    TL_END = Math.max(23 * 60, PEAK_END);
+    document.querySelectorAll(".peak-rot").forEach(el => { el.textContent = PEAK_LABEL; });
+  }
   function inPeak(t) { const m = timeToMin(t); return m !== null && m >= PEAK_START && m <= PEAK_END; }
-  // duração assumida de uma atividade COM horário: 2h se começa dentro do pico (foco 15h–22h), 1h fora.
+  // duração assumida de uma atividade COM horário: 2h se começa dentro do pico, 1h fora.
   function durationMin(item) { return (item && item.time && inPeak(item.time)) ? 120 : 60; }
 
   function prettyDay(s) {
@@ -1893,7 +1914,7 @@
   const UPSELL = {
     context: { title: "Múltiplos contextos", text: "Separe Pessoal, cada negócio e cada projeto em agendas e matrizes independentes. No plano grátis você tem 1 contexto." },
     history: { title: "Histórico ilimitado", text: "No plano grátis você acessa os últimos 30 dias. Com o Pro, todo o seu histórico fica disponível — sem limite de tempo." },
-    report: { title: "Relatório cronobiológico", text: "Veja toda semana quanto do seu trabalho importante caiu no pico 15h–22h, com insight acionável e distribuição por horário. Disponível no Pro." },
+    report: { title: "Relatório cronobiológico", text: "Veja toda semana quanto do seu trabalho importante caiu no seu pico, com insight acionável e distribuição por horário. Disponível no Pro." },
     theme: { title: "Temas", text: "Troque a paleta do app entre várias vibes. No plano grátis você fica no tema Roxo padrão." },
     export: { title: "Exportar agenda", text: "Leve seus compromissos pro Google, Apple ou Outlook (.ics) ou gere um PDF da sua agenda. Disponível no Pro." },
     ai: { title: "Resolver com IA", text: "Delegue tarefas para a IA: ela redige o texto pronto ou monta o passo-a-passo pra você resolver na hora. Disponível no Pro." }
@@ -2022,7 +2043,7 @@
     const L = [];
     L.push("Agenda/contexto: " + activeCtx().name + ".");
     L.push("Período analisado: " + scope + ".");
-    L.push("Importantes: " + d.importantCount + "; com horário: " + d.timed + "; no pico 15h-22h: " + d.inPeakC + "; fora do pico: " + d.offPeakC + "; sem horário: " + d.noTime + ".");
+    L.push("Importantes: " + d.importantCount + "; com horário: " + d.timed + "; no pico " + PEAK_LABEL + ": " + d.inPeakC + "; fora do pico: " + d.offPeakC + "; sem horário: " + d.noTime + ".");
     if (d.pct !== null) L.push("Percentual do importante que cai no pico: " + d.pct + "%.");
     if (d.timedItems && d.timedItems.length) {
       const sample = d.timedItems.slice(0, 8).map(x =>
@@ -2163,7 +2184,7 @@
       '.n{font-size:12px;color:#6b6551;margin-left:48px;margin-top:2px;}.due{color:#6b6551;font-size:12px;}.empty{color:#9a9179;}' +
       '@media print{body{padding:0;}}' +
       '</style></head><body><header><div class="brand-row">' + logoTag + '<h1>SmartDayZ</h1></div><div class="ctx">' + escapeHTML(ctx.name) + '</div>' +
-      '<div class="meta">Gerado em ' + new Date().toLocaleDateString("pt-BR") + ' · pico de energia 15h–22h destacado</div></header>' +
+      '<div class="meta">Gerado em ' + new Date().toLocaleDateString("pt-BR") + ' · pico de energia ' + PEAK_LABEL + ' destacado</div></header>' +
       body + tk + "</body></html>";
   }
   function exportPDF() {
@@ -2233,7 +2254,7 @@
     const timedAll = [];
     ctxData().events.forEach(e => { if (e.time && inWin(e, false)) timedAll.push(e); });
     ctxData().tasks.forEach(t => { if (t.time && inWin(t, true)) timedAll.push(t); });
-    // o pico 15h–22h é uma janela DIÁRIA com teto de 3 atividades por dia.
+    // o pico é uma janela DIÁRIA com teto de 3 atividades por dia.
     const PEAK_MAX = 3;
     const dateOf = (x) => x.date || x.start || x.due;
     const peakByDate = {}; // ocupação atual do pico, contada por dia
@@ -2241,12 +2262,12 @@
     timedAll.forEach(x => {
       // dentro do pico: o que não é importante deve sair (libera o pico pro que muda o jogo).
       if (!markImp(x) && inPeak(x.time)) {
-        out.push({ type: "time", text: "“" + escapeHTML(x.title) + "” não é importante e está no pico às " + x.time + ". Tire do pico — 15h–22h é pro que muda o jogo." });
+        out.push({ type: "time", text: "“" + escapeHTML(x.title) + "” não é importante e está no pico às " + x.time + ". Tire do pico — " + PEAK_LABEL + " é pro que muda o jogo." });
       // fora do pico: só sugere trazer o que é IMPORTANTE E URGENTE (junto), até lotar as 3 vagas do dia.
       } else if (markImp(x) && markUrg(x) && !inPeak(x.time)) {
         const dk = dateOf(x);
         if ((peakByDate[dk] || 0) < PEAK_MAX) {
-          out.push({ type: "time", text: "“" + escapeHTML(x.title) + "” é importante e urgente e está fora do pico às " + x.time + ". Traga pro intervalo 15h–22h (máx. 3 no pico)." });
+          out.push({ type: "time", text: "“" + escapeHTML(x.title) + "” é importante e urgente e está fora do pico às " + x.time + ". Traga pro intervalo " + PEAK_LABEL + " (máx. 3 no pico)." });
           peakByDate[dk] = (peakByDate[dk] || 0) + 1;
         }
       }
@@ -2289,7 +2310,7 @@
       let insight, cls;
       if (d.pct === null) { insight = "Suas atividades importantes estão sem horário. Defina horários pra ver quanto cai no pico."; cls = "neutral"; }
       else if (d.pct >= 70) { insight = "Você está protegendo seu pico. Mantenha o ritmo."; cls = "good"; }
-      else if (d.pct >= 40) { insight = "Boa parte do trabalho importante está fora do pico. Tente remarcar pro intervalo 15h–22h."; cls = "warn"; }
+      else if (d.pct >= 40) { insight = "Boa parte do trabalho importante está fora do pico. Tente remarcar pro intervalo " + PEAK_LABEL + "."; cls = "warn"; }
       else { insight = "A maior parte do que muda o jogo está fora do pico. Reorganize pra ganhar tração."; cls = "bad"; }
 
       const pctLabel = d.pct === null ? "—" : d.pct + "%";
@@ -2297,7 +2318,7 @@
       const maxC = Math.max(1, ...hours.map(h => d.buckets[h] || 0));
       const bars = hours.map(h => {
         const c = d.buckets[h] || 0;
-        const peak = h >= 15 && h < 22;
+        const peak = h * 60 >= PEAK_START && h * 60 < PEAK_END;
         const hpx = c ? Math.max(Math.round((c / maxC) * 100), 10) : 0;
         return '<div class="hb-col"><div class="hb' + (peak ? " peak" : "") + '" style="height:' + hpx + '%" title="' + h + 'h: ' + c + '"></div></div>';
       }).join("");
@@ -2455,7 +2476,7 @@
       // pico na Pessoal (com mais de uma agenda): reservado pro trabalho que muda o jogo.
       // A ÚNICA quebra é a emergência (SOS) — day off não libera mais o pico.
       if (isPersonalCtx() && store.contexts.length > 1 && time && inPeak(time) && !sosFlag) {
-        $("#formMsg").textContent = "Na agenda Pessoal, o pico 15h–22h é reservado pro trabalho que muda o jogo. Escolha outro horário — ou marque como SOS se for emergência.";
+        $("#formMsg").textContent = "Na agenda Pessoal, o pico " + PEAK_LABEL + " é reservado pro trabalho que muda o jogo. Escolha outro horário — ou marque como SOS se for emergência.";
         return;
       }
       if (editing && editing.kind === "event") {
@@ -2478,7 +2499,7 @@
       }
       // mesma regra do pico dos compromissos: na Pessoal (com +1 agenda), pico só com SOS.
       if (isPersonalCtx() && store.contexts.length > 1 && time && inPeak(time) && !sosFlag) {
-        $("#formMsg").textContent = "Na agenda Pessoal, o pico 15h–22h é reservado pro trabalho que muda o jogo. Escolha outro horário — ou marque como SOS se for emergência.";
+        $("#formMsg").textContent = "Na agenda Pessoal, o pico " + PEAK_LABEL + " é reservado pro trabalho que muda o jogo. Escolha outro horário — ou marque como SOS se for emergência.";
         return;
       }
       if (editing && editing.kind === "task") {
