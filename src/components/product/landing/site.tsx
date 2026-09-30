@@ -7,17 +7,26 @@ const LINKS = [
   { label: "Dúvidas", href: "#duvidas" },
 ];
 
-export function SiteNav() {
+/** `base="/"` quando a página não é a home, para as âncoras voltarem às seções da landing. */
+export function SiteNav({ base = "" }: { base?: string }) {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-canvas/90 backdrop-blur">
       <nav className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" aria-label="SmartDayZ, início" className="rounded-md focus-visible:outline-2 focus-visible:outline-navy">
+        <Link
+          href="/"
+          aria-label="SmartDayZ, início"
+          className="rounded-md focus-visible:outline-2 focus-visible:outline-navy"
+        >
           <Logo />
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="text-[15px] font-medium text-navy hover:text-orange-text">
+            <a
+              key={l.href}
+              href={base + l.href}
+              className="text-[15px] font-medium text-navy hover:text-orange-text"
+            >
               {l.label}
             </a>
           ))}
@@ -30,7 +39,10 @@ export function SiteNav() {
           >
             Entrar
           </Link>
-          <BotaoLink href="/quiz" className="!px-3.5 !py-2 !text-sm whitespace-nowrap">
+          <BotaoLink
+            href="/quiz"
+            className="!px-3.5 !py-2 !text-sm whitespace-nowrap"
+          >
             <span className="sm:hidden">Começar</span>
             <span className="hidden sm:inline">Começar a organizar</span>
           </BotaoLink>
@@ -54,9 +66,8 @@ export function Hero() {
             com <span className="text-orange">direção</span>.
           </h1>
           <p className="mt-6 max-w-[38ch] text-lg leading-relaxed text-body sm:text-xl">
-            Organize tarefas, enxergue urgência e importância e receba
-            sugestões de IA para planejar sua rotina — com a decisão final
-            sempre sua.
+            Organize tarefas, enxergue urgência e importância e receba sugestões
+            de IA para planejar sua rotina — com a decisão final sempre sua.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <BotaoLink href="/quiz">Começar a organizar</BotaoLink>
@@ -64,7 +75,9 @@ export function Hero() {
               Ver como funciona
             </BotaoLink>
           </div>
-          <p className="mt-5 text-sm text-soft">Gratuito para começar. Sem cartão.</p>
+          <p className="mt-5 text-sm text-soft">
+            Gratuito para começar. Sem cartão.
+          </p>
         </div>
 
         <div className="relative overflow-hidden rounded-[20px] bg-navy shadow-[0_30px_60px_-30px_rgba(11,26,64,0.55)]">
@@ -84,7 +97,8 @@ export function Hero() {
               </span>
             </div>
             <p className="mt-3 text-[15px] leading-relaxed">
-              A proposta vence amanhã. Vale colocá-la antes da revisão sem prazo?
+              A proposta vence amanhã. Vale colocá-la antes da revisão sem
+              prazo?
             </p>
             <p className="mt-3 text-[12px] text-white/65">
               É só uma dica: nada muda na agenda sem você.
@@ -96,7 +110,7 @@ export function Hero() {
   );
 }
 
-export function SiteFooter() {
+export function SiteFooter({ base = "" }: { base?: string }) {
   return (
     <footer className="bg-navy text-white">
       <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-4 py-8 sm:px-6 md:flex-row md:items-center md:justify-between">
@@ -106,16 +120,57 @@ export function SiteFooter() {
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="text-white/85 hover:text-orange">
+            <a
+              key={l.href}
+              href={base + l.href}
+              className="text-white/85 hover:text-orange"
+            >
               {l.label}
             </a>
           ))}
           <Link href="/login" className="text-white/85 hover:text-orange">
             Entrar
           </Link>
+          <Link href="/termos" className="text-white/85 hover:text-orange">
+            Termos de uso
+          </Link>
+          <Link href="/privacidade" className="text-white/85 hover:text-orange">
+            Privacidade
+          </Link>
         </div>
-        <p className="text-sm text-white/70">© {new Date().getFullYear()} SmartDayZ</p>
+        <p className="text-sm text-white/70">
+          © {new Date().getFullYear()} SmartDayZ
+        </p>
       </div>
     </footer>
+  );
+}
+
+/** Casca das páginas legais (/termos, /privacidade): nav, texto corrido e rodapé. */
+export function PaginaLegal({
+  titulo,
+  atualizado,
+  children,
+}: {
+  titulo: string;
+  atualizado: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="font-display flex flex-1 flex-col bg-canvas text-navy">
+      <SiteNav base="/" />
+      <main className="mx-auto w-full max-w-[760px] flex-1 px-4 py-12 sm:px-6 sm:py-16">
+        <h1 className="text-[36px] font-extrabold leading-tight tracking-[-0.03em] sm:text-[44px]">
+          {titulo}
+        </h1>
+        <p className="mt-3 text-sm text-soft">
+          Última atualização: {atualizado}
+        </p>
+        <div className="mt-10 flex flex-col gap-8 text-[16px] leading-relaxed text-body [&_a]:font-medium [&_a]:text-navy [&_a]:underline [&_h2]:mb-3 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-navy [&_li]:mt-1.5 [&_p+p]:mt-3 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5">
+          {children}
+        </div>
+      </main>
+      <SiteFooter base="/" />
+    </div>
   );
 }
