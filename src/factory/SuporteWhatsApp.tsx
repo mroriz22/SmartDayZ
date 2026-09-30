@@ -154,6 +154,8 @@ export function SuporteWhatsApp({
 }: SuporteProps) {
   const pathname = usePathname() ?? "/";
   const [montado, setMontado] = useState(false);
+  // Marca a montagem no cliente para não divergir da renderização do servidor.
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- intencional: roda uma vez, após montar
   useEffect(() => setMontado(true), []);
 
   // A bolinha em "auto" nem aparece fora das telas críticas. Consultar a conta em toda

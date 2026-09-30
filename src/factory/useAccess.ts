@@ -48,6 +48,8 @@ export function useAccess() {
   }, []);
 
   useEffect(() => {
+    // Busca inicial da conta; o setState acontece dentro do refresh (fetch externo).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intencional: sincroniza com a API
     void refresh();
   }, [refresh]);
 
