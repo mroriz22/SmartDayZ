@@ -17,10 +17,24 @@ const inter = Inter({
 
 const appName = process.env.APP_NAME ?? "SmartDayZ";
 
+const title = `${appName}: seu dia, com direção`;
+const description =
+  "Organize tarefas, enxergue urgência e importância e monte o dia com a matriz de Eisenhower e o seu pico de energia. A decisão final é sempre sua.";
+
 export const metadata: Metadata = {
-  title: `${appName} — seu dia, com direção`,
-  description:
-    "Organize tarefas, enxergue urgência e importância e monte o dia com a matriz de Eisenhower e o seu pico de energia. A decisão final é sempre sua.",
+  // Domínio de produção fixo: og:image precisa de URL absoluta que abra fora do servidor.
+  metadataBase: new URL("https://smartdayz.com"),
+  title,
+  description,
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "/",
+    siteName: appName,
+    title,
+    description,
+  },
+  twitter: { card: "summary_large_image", title, description },
   // PWA: o mesmo manifest do app (/app), para instalar também a partir da landing.
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: appName, statusBarStyle: "default" },
@@ -32,7 +46,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${manrope.variable} ${inter.variable} h-full antialiased`}>
+    <html
+      lang="pt-BR"
+      className={`${manrope.variable} ${inter.variable} h-full antialiased`}
+    >
       <body className="flex min-h-full flex-col">
         {children}
         <SuporteWhatsApp produto={appName} />
