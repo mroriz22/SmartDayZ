@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { factoryConfig } from "@/factory/config";
+import { CtaMedido } from "@/components/cta-medido";
 
 export const metadata = {
   title: "Planos · SmartDayZ",
@@ -51,21 +52,23 @@ export default function PricingPage() {
         </ul>
 
         {url ? (
-          <a
+          <CtaMedido
             href={url}
+            evento="checkout_iniciado"
+            dados={{ plano: "pro", valor: 14.9 }}
             className="mt-6 inline-flex w-full justify-center rounded-btn bg-signal px-4 py-3 text-sm font-medium text-white hover:opacity-90"
           >
             Assinar o Pro
-          </a>
+          </CtaMedido>
         ) : (
           /* Sem link de checkout configurado: o visitante ainda tem um caminho,
              em vez de ver um recado de configuração. */
-          <Link
+          <CtaMedido
             href="/login"
             className="mt-6 inline-flex w-full justify-center rounded-btn bg-signal px-4 py-3 text-sm font-medium text-white hover:opacity-90"
           >
             Começar o teste de {factoryConfig.trialDays} dias
-          </Link>
+          </CtaMedido>
         )}
 
         <p className="mt-3 text-center text-xs text-slate">

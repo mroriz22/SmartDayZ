@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { lerRespostas } from "@/lib/product/onboarding";
 import { authClient } from "@/lib/auth-client";
+import { eventoMedicao } from "@/lib/medicao";
 
 /** Traduz o recado técnico do Better Auth pra uma frase que a pessoa entende. */
 function recado(bruto: string, modo: "login" | "signup") {
@@ -51,6 +52,9 @@ export default function LoginPage() {
       if (mode === "signup") {
         const res = await authClient.signUp.email({ email, password, name: name || email.split("@")[0] });
         if (res.error) throw new Error(res.error.message ?? "signup failed");
+        // Conversão que o anúncio persegue. Fica depois do sucesso: conta que falhou não
+        // é conversão, e contar errado ensina o anúncio a buscar a pessoa errada.
+        eventoMedicao("cadastro");
       } else {
         const res = await authClient.signIn.email({ email, password });
         if (res.error) throw new Error(res.error.message ?? "login failed");

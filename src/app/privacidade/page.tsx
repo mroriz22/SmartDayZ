@@ -14,7 +14,7 @@ export default function PrivacidadePage() {
   return (
     <PaginaLegal
       titulo="Política de privacidade"
-      atualizado="30 de setembro de 2026"
+      atualizado="4 de outubro de 2026"
     >
       <section>
         <p>
@@ -68,6 +68,10 @@ export default function PrivacidadePage() {
             (legítimo interesse).
           </li>
           <li>
+            Saber quais anúncios e canais trazem gente para o SmartDayZ
+            (legítimo interesse).
+          </li>
+          <li>
             Responder seus pedidos de suporte e cumprir obrigações legais, como
             guardar registros fiscais.
           </li>
@@ -100,7 +104,10 @@ export default function PrivacidadePage() {
 
       <section>
         <h2>4. Com quem compartilhamos</h2>
-        <p>Só com os serviços necessários para o SmartDayZ funcionar:</p>
+        <p>
+          Só com os serviços necessários para o SmartDayZ funcionar e com os
+          que medem os nossos anúncios:
+        </p>
         <ul>
           <li>
             <strong>Hospedagem:</strong> os servidores e o banco de dados onde o
@@ -118,6 +125,12 @@ export default function PrivacidadePage() {
             <strong>IA:</strong> quando você pede uma sugestão, o texto das
             tarefas envolvidas é enviado ao provedor de IA (Google Gemini) só
             para gerar a resposta.
+          </li>
+          <li>
+            <strong>Medição de anúncios:</strong> a Meta (Facebook e Instagram)
+            e o Google recebem que houve uma visita a uma página pública, um
+            cadastro ou um clique para assinar. Nunca recebem suas tarefas nem
+            sua agenda.
           </li>
         </ul>
         <p>
@@ -158,9 +171,19 @@ export default function PrivacidadePage() {
         <h2>7. Segurança e cookies</h2>
         <p>
           O acesso ao app usa conexão criptografada (HTTPS) e senhas guardadas
-          com criptografia. Usamos só os cookies necessários para manter você
-          conectado. O app instalado no celular guarda uma cópia da agenda no
-          próprio aparelho para funcionar sem internet.
+          com criptografia. O app instalado no celular guarda uma cópia da
+          agenda no próprio aparelho para funcionar sem internet.
+        </p>
+        <p>
+          Além dos cookies necessários para manter você conectado, as páginas
+          públicas (apresentação, planos, termos, esta política, questionário
+          inicial e login) e o cadastro usam cookies de medição da Meta e do
+          Google. Eles servem para sabermos quais anúncios e canais trazem gente
+          que realmente usa o SmartDayZ, e não são usados para montar perfil de
+          consumo seu. Dentro do app, as telas que você abre não são enviadas:
+          a Meta e o Google só ficam sabendo que uma conta foi criada ou que
+          alguém clicou para assinar. Você pode bloquear essa medição no seu
+          navegador ou com um bloqueador de anúncios, sem perder nada do app.
         </p>
       </section>
 
