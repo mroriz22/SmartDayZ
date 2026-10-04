@@ -19,6 +19,12 @@ import { visitaMedicao } from "@/lib/medicao";
  *
  * Por isso os dois scripts são instalados com a visita automática DESLIGADA e cada visita
  * é disparada na mão aqui embaixo, só nas páginas públicas.
+ *
+ * No Pixel da Meta isso pede duas linhas antes do init: `disablePushState`, senão cada
+ * troca de rota do Next vira PageView sozinha, inclusive nas telas internas; e `autoConfig`
+ * desligado, senão o Pixel lê botões e campos da página por conta própria. No GA4, a mesma
+ * coisa se desliga no painel: Medição otimizada, visualizações de página por eventos do
+ * histórico do navegador.
  */
 
 const PIXEL_META = process.env.NEXT_PUBLIC_META_PIXEL_ID;
@@ -68,6 +74,8 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window,document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
+fbq.disablePushState = true;
+fbq('set', 'autoConfig', false, '${PIXEL_META}');
 fbq('init', '${PIXEL_META}');`}
         </Script>
       ) : null}
