@@ -106,7 +106,7 @@ export function Planos({ trialDias }: { trialDias: number }) {
                 </li>
               ))}
             </ul>
-            <BotaoLink href="/quiz" variante="secundario" className="mt-8 w-full">
+            <BotaoLink href="/quiz" variante="secundario" className="mt-8 w-full" medir>
               Começar grátis
             </BotaoLink>
           </div>
@@ -128,7 +128,7 @@ export function Planos({ trialDias }: { trialDias: number }) {
                 </li>
               ))}
             </ul>
-            <BotaoLink href="/login?modo=cadastro" className="mt-8 w-full">
+            <BotaoLink href="/login?modo=cadastro" className="mt-8 w-full" medir>
               Experimentar o Pro
             </BotaoLink>
           </div>
@@ -214,7 +214,7 @@ export function ChamadaFinal() {
               Cadastre uma tarefa, marque urgência e importância e veja seu dia
               montado. Leva menos de dois minutos.
             </p>
-            <BotaoLink href="/quiz" className="mt-8 self-start">
+            <BotaoLink href="/quiz" className="mt-8 self-start" medir>
               Comece pela próxima tarefa
             </BotaoLink>
           </div>
