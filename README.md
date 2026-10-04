@@ -2,14 +2,14 @@
 
 OS da **fábrica de SaaS** — multi-repo, Next only.
 
-| Peça | Tech |
-|------|------|
-| App | Next.js (App Router) |
-| Auth | Better Auth |
-| DB / cache | Postgres + Drizzle · Redis |
-| Billing | Quack Checkout + trial + paywall |
-| Analytics | → [`saas-control`](../saas-control) |
-| Deploy | Coolify / VPS BR |
+| Peça       | Tech                                |
+| ---------- | ----------------------------------- |
+| App        | Next.js (App Router)                |
+| Auth       | Better Auth                         |
+| DB / cache | Postgres + Drizzle · Redis          |
+| Billing    | Quack Checkout + trial + paywall    |
+| Analytics  | → [`saas-control`](../saas-control) |
+| Deploy     | Coolify / VPS BR                    |
 
 ## Ideia
 
@@ -67,24 +67,43 @@ signup → trial (TRIAL_DAYS)
 
 ## API fábrica (pro front)
 
-| Endpoint | |
-|----------|--|
-| `GET /api/factory/me` | session + access snapshot |
-| `POST /api/factory/track` | analytics (proxy pro control) |
-| `POST /api/webhooks/quack` | entrega Quack (HMAC) |
+| Endpoint                   |                               |
+| -------------------------- | ----------------------------- |
+| `GET /api/factory/me`      | session + access snapshot     |
+| `POST /api/factory/track`  | analytics (proxy pro control) |
+| `POST /api/webhooks/quack` | entrega Quack (HMAC)          |
 
 ```ts
-import { RequireAccess, useAccess, trackClient, factoryConfig } from "@/factory";
+import {
+  RequireAccess,
+  useAccess,
+  trackClient,
+  factoryConfig,
+} from "@/factory";
 ```
 
-## Env crítico
+## Variáveis de ambiente
 
-| var | |
-|-----|--|
-| `SAAS_SLUG` | id estável no admin |
-| `TRIAL_DAYS` | 0 = sem trial |
-| `QUACK_CHECKOUT_URL` | CTA paywall |
-| `QUACK_WEBHOOK_SECRET` | HMAC inbound |
-| `FACTORY_CONTROL_URL` + `FACTORY_INGEST_KEY` | analytics central |
+A lista completa está em [`.env.example`](./.env.example), com um comentário por chave dizendo pra que serve e se é obrigatória. Copie com `cp .env.example .env` e preencha; valores reais nunca vão pro git.
+
+| var                                          | obrigatória? | pra que serve                                       |
+| -------------------------------------------- | ------------ | --------------------------------------------------- |
+| `DATABASE_URL`                               | sim          | Postgres do app, drizzle e `/api/product/setup`     |
+| `BETTER_AUTH_URL`                            | sim          | URL pública do app (baseURL do auth)                |
+| `BETTER_AUTH_SECRET`                         | sim          | segredo de sessão (`openssl rand -base64 32`)       |
+| `QUACK_WEBHOOK_SECRET`                       | em produção  | HMAC do `POST /api/webhooks/quack`                  |
+| `QUACK_CHECKOUT_URL`                         | em produção  | CTA do paywall                                      |
+| `QUACK_PRODUCT_ID`                           | não          | product ID principal na Quack                       |
+| `APP_NAME`                                   | não          | nome exibido no app                                 |
+| `SAAS_SLUG`                                  | não          | id estável no admin                                 |
+| `NODE_ENV`                                   | não          | ambiente (o Next define sozinho)                    |
+| `TRIAL_DAYS`                                 | não          | dias de trial no signup (0 = sem trial)             |
+| `PAYWALL_PREFIXES`                           | não          | rotas atrás do paywall                              |
+| `NEXT_ALLOWED_DEV_ORIGINS`                   | não          | origens extras no `next dev`                        |
+| `SETUP_TOKEN`                                | não          | libera `POST /api/product/setup`; vazio = desligado |
+| `REDIS_URL` + `REDIS_PREFIX`                 | não          | Redis compartilhado e prefixo das chaves            |
+| `GEMINI_API_KEY` + `AI_MODEL`                | não          | IA em `/api/product/ai`; sem chave = IA desligada   |
+| `FACTORY_CONTROL_URL` + `FACTORY_INGEST_KEY` | não          | analytics central (saas-control)                    |
+| `BASE` / `E2E_PORT`                          | não          | alvo do smoke `scripts/e2e-smoke.mjs`               |
 
 Agent key Quack **não** entra no runtime do app.
