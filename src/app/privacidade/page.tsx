@@ -129,8 +129,10 @@ export default function PrivacidadePage() {
           <li>
             <strong>Medição de anúncios:</strong> a Meta (Facebook e Instagram)
             e o Google recebem que houve uma visita a uma página pública, um
-            cadastro ou um clique para assinar. Nunca recebem suas tarefas nem
-            sua agenda.
+            cadastro ou um clique para assinar. Quando você assina, o nosso
+            servidor avisa a Meta da compra, com o valor e o seu e-mail
+            embaralhado (um código que não dá para converter de volta no
+            e-mail). Nunca recebem suas tarefas nem sua agenda.
           </li>
         </ul>
         <p>
@@ -184,6 +186,14 @@ export default function PrivacidadePage() {
           a Meta e o Google só ficam sabendo que uma conta foi criada ou que
           alguém clicou para assinar. Você pode bloquear essa medição no seu
           navegador ou com um bloqueador de anúncios, sem perder nada do app.
+        </p>
+        <p>
+          Um cookie nosso guarda, por 90 dias, só de onde veio a sua primeira
+          visita (por exemplo, um link do Instagram ou uma busca no Google).
+          Quando você cria a conta, essa informação e a resposta opcional de
+          como conheceu o SmartDayZ ficam registradas com o cadastro, para
+          sabermos quais caminhos trazem gente. Ela não é enviada para a Meta
+          nem para o Google.
         </p>
       </section>
 

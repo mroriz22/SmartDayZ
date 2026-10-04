@@ -6,6 +6,7 @@ import { useEffect, useId, useState } from "react";
 import { lerRespostas } from "@/lib/product/onboarding";
 import { authClient } from "@/lib/auth-client";
 import { eventoMedicao } from "@/lib/medicao";
+import { COMO_CONHECEU, guardarResposta } from "@/lib/origem";
 
 /** Traduz o recado técnico do Better Auth pra uma frase que a pessoa entende. */
 function recado(bruto: string, modo: "login" | "signup") {
@@ -27,6 +28,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [verSenha, setVerSenha] = useState(false);
   const [name, setName] = useState("");
+  // Opcional de propósito: não trava o cadastro. É o que mostra se grupo, Instagram e busca
+  // estão trazendo gente, porque esses caminhos não deixam rastro de anúncio.
+  const [comoConheceu, setComoConheceu] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const id = useId();
@@ -50,6 +54,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
+        // Vai no cookie de origem (lib/origem.ts), que o servidor lê quando a conta nasce.
+        guardarResposta(comoConheceu);
         const res = await authClient.signUp.email({ email, password, name: name || email.split("@")[0] });
         if (res.error) throw new Error(res.error.message ?? "signup failed");
         // Conversão que o anúncio persegue. Fica depois do sucesso: conta que falhou não
@@ -150,6 +156,28 @@ export default function LoginPage() {
             </p>
           )}
         </div>
+
+        {mode === "signup" && (
+          <div className="space-y-1.5">
+            <label className={rotulo} htmlFor={`${id}-conheceu`}>
+              Como você conheceu o SmartDayZ?{" "}
+              <span className="font-normal text-slate">(opcional)</span>
+            </label>
+            <select
+              id={`${id}-conheceu`}
+              className={campo}
+              value={comoConheceu}
+              onChange={(e) => setComoConheceu(e.target.value)}
+            >
+              <option value="">Escolha uma opção</option>
+              {COMO_CONHECEU.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {error && (
           <p role="alert" className="rounded-btn bg-signal/10 px-3 py-2 text-sm text-signal">
