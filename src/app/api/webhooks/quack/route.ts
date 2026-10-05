@@ -9,6 +9,7 @@ import { redis, redisKey } from "@/lib/redis";
 import { markCanceled, markPastDue } from "@/factory/billing";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
+import { enviarCompraMeta } from "@/lib/meta-capi";
 
 export const runtime = "nodejs";
 
@@ -24,6 +25,10 @@ const PAID = new Set([
   "subscription.activated",
   "subscription.renewed",
 ]);
+
+// Vão pro Meta como venda (lib/meta-capi.ts). Renovação fica de fora: é a mesma pessoa
+// pagando de novo, e contar de novo inflaria o retorno do anúncio que trouxe ela.
+const VENDA_NOVA = new Set(["order.paid", "subscription.activated"]);
 
 /**
  * Cadastre na Quack:
@@ -79,6 +84,11 @@ export async function POST(req: Request) {
         periodEnd: buyer.periodEnd,
         plan: "pro",
       });
+      // Depois de liberar o acesso, nunca antes: se o Meta demorar ou recusar, a assinatura
+      // da pessoa já está valendo. Aviso repetido (already) não manda de novo.
+      if (!result.already && VENDA_NOVA.has(envelope.type)) {
+        await enviarCompraMeta({ email: buyer.email, totalCents: buyer.totalCents, plano: "pro" });
+      }
       return json({
         ok: true,
         userId: result.userId,

@@ -2,6 +2,7 @@
 
 import { analytics } from "./analytics";
 import { factoryConfig } from "./config";
+import { eventoMedicao } from "@/lib/medicao";
 import type { AccessSnapshot } from "./billing";
 import { useEffect } from "react";
 
@@ -42,7 +43,11 @@ export function PaywallScreen({ access, userId }: Props) {
       {checkoutUrl ? (
         <a
           href={checkoutUrl}
-          onClick={() => void analytics.checkoutClicked(userId ?? null)}
+          onClick={() => {
+            void analytics.checkoutClicked(userId ?? null);
+            // Medição de anúncio: o passo antes da venda, que acontece na Quack.
+            eventoMedicao("checkout_iniciado", { plano: "pro", valor: 14.9 });
+          }}
           className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900"
         >
           Assinar agora

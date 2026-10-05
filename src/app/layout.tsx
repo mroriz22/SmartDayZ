@@ -3,6 +3,7 @@ import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import { SuporteWhatsApp } from "@/factory/SuporteWhatsApp";
 import { Medicao } from "@/components/medicao";
+import { GuardarOrigem } from "@/components/guardar-origem";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -63,6 +64,7 @@ export default function RootLayout({
         {children}
         <SuporteWhatsApp produto={appName} />
         <Medicao />
+        <GuardarOrigem />
       </body>
     </html>
   );
