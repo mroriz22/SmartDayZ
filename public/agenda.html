@@ -1405,7 +1405,9 @@
         const s = document.createElement("script");
         s.async = true; s.src = "https://connect.facebook.net/en_US/fbevents.js";
         document.head.appendChild(s);
-        // sem coleta automática de cliques e textos da tela: aqui dentro só os dois avisos.
+        // sem PageView sozinho em troca de endereço (history) e sem coleta automática de
+        // cliques e textos da tela: aqui dentro só os dois avisos.
+        n.disablePushState = true;
         window.fbq("set", "autoConfig", false, pixel);
         window.fbq("init", pixel); // sem PageView de propósito
       }
