@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CtaMedido } from "@/components/cta-medido";
 
 /** Peças pequenas da landing e do onboarding (design de 23/09/2026). */
 
@@ -55,17 +56,27 @@ export const botao = {
   escuro: `${base} bg-navy text-white hover:bg-navy-soft`,
 };
 
+/** `medir`: botão de começar / testar grátis, avisa `clique_testar` à medição de anúncio. */
 export function BotaoLink({
   href,
   variante = "primario",
   className = "",
+  medir = false,
   children,
 }: {
   href: string;
   variante?: keyof typeof botao;
   className?: string;
+  medir?: boolean;
   children: React.ReactNode;
 }) {
+  if (medir) {
+    return (
+      <CtaMedido href={href} className={`${botao[variante]} ${className}`}>
+        {children}
+      </CtaMedido>
+    );
+  }
   return (
     <Link href={href} className={`${botao[variante]} ${className}`}>
       {children}

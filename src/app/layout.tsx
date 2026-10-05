@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import { SuporteWhatsApp } from "@/factory/SuporteWhatsApp";
+import { Medicao } from "@/components/medicao";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -38,6 +39,14 @@ export const metadata: Metadata = {
   // PWA: o mesmo manifest do app (/app), para instalar também a partir da landing.
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: appName, statusBarStyle: "default" },
+  // Verificação de domínio do Google (Search Console) e da Meta, lidas do ambiente na hora
+  // do build. Sem valor, a tag não sai (nada de content vazio).
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.META_DOMAIN_VERIFICATION
+      ? { "facebook-domain-verification": process.env.META_DOMAIN_VERIFICATION }
+      : undefined,
+  },
 };
 
 export default function RootLayout({
@@ -53,6 +62,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         {children}
         <SuporteWhatsApp produto={appName} />
+        <Medicao />
       </body>
     </html>
   );

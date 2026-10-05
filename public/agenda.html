@@ -1379,6 +1379,73 @@
     }
   }
 
+  // ---------- medição de anúncio (Meta e Google) ----------
+  // Cópia pequena de src/lib/medicao.ts: a agenda é HTML estático e não passa pelo React.
+  // Aqui dentro só saem dois avisos: conta criada (cadastro) e clique em assinar
+  // (checkout_iniciado). Nenhuma visita de tela e nenhum conteúdo da agenda: é promessa
+  // da Política de Privacidade. Sem as variáveis no servidor, /api/medicao devolve vazio
+  // e nenhum script é carregado. Medição nunca pode quebrar a agenda: tudo em try/catch.
+  const MEDICAO = {
+    cadastro: { meta: "CompleteRegistration", metaPadrao: true, google: "sign_up" },
+    checkout_iniciado: { meta: "InitiateCheckout", metaPadrao: true, google: "begin_checkout" },
+  };
+  let conversaoCadastroGoogle = "";
+  async function carregarMedicao() {
+    if (location.protocol === "file:") return;
+    try {
+      const r = await fetch("/api/medicao", { credentials: "omit" });
+      if (!r.ok) return;
+      const c = await r.json();
+      const pixel = String((c && c.pixelMeta) || "");
+      const tag = String((c && c.tagGoogle) || "");
+      if (/^\d+$/.test(pixel) && !window.fbq) {
+        const n = window.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+        if (!window._fbq) window._fbq = n;
+        n.push = n; n.loaded = true; n.version = "2.0"; n.queue = [];
+        const s = document.createElement("script");
+        s.async = true; s.src = "https://connect.facebook.net/en_US/fbevents.js";
+        document.head.appendChild(s);
+        // sem PageView sozinho em troca de endereço (history) e sem coleta automática de
+        // cliques e textos da tela: aqui dentro só os dois avisos.
+        n.disablePushState = true;
+        window.fbq("set", "autoConfig", false, pixel);
+        window.fbq("init", pixel); // sem PageView de propósito
+      }
+      if (/^[A-Z]+-[A-Z0-9]+$/i.test(tag) && !window.gtag) {
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { window.dataLayer.push(arguments); };
+        const s = document.createElement("script");
+        s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(tag);
+        document.head.appendChild(s);
+        window.gtag("js", new Date());
+        window.gtag("config", tag, { send_page_view: false });
+        conversaoCadastroGoogle = String((c && c.conversaoCadastroGoogle) || "");
+      }
+    } catch (e) { /* sem medição, a agenda segue igual */ }
+  }
+  function medir(evento, dados) {
+    const nomes = MEDICAO[evento];
+    if (!nomes) return;
+    dados = dados || {};
+    try {
+      if (window.fbq) {
+        const p = {};
+        if (dados.valor !== undefined) { p.value = dados.valor; p.currency = "BRL"; }
+        if (dados.plano) p.content_name = dados.plano;
+        window.fbq(nomes.metaPadrao ? "track" : "trackCustom", nomes.meta, p);
+      }
+    } catch (e) { /* no-op */ }
+    try {
+      if (window.gtag) {
+        const p = {};
+        if (dados.valor !== undefined) { p.value = dados.valor; p.currency = "BRL"; }
+        if (dados.plano) p.items = [{ item_name: dados.plano }];
+        window.gtag("event", nomes.google, p);
+        if (evento === "cadastro" && conversaoCadastroGoogle) window.gtag("event", "conversion", { send_to: conversaoCadastroGoogle });
+      }
+    } catch (e) { /* no-op */ }
+  }
+
   async function signIn(email, password) {
     const r = await API.post("/api/auth/sign-in/email", { email: email, password: password });
     if (!r.ok) return { ok: false, error: friendlyAuthErr(r.data && (r.data.message || r.data.error)) };
@@ -2184,6 +2251,7 @@
     try {
       const r = pwMode === "signin" ? await signIn(email, pass) : await signUp(email, pass);
       if (r.ok) {
+        if (pwMode === "signup") medir("cadastro"); // só conta criada de verdade
         openPaywall(); // re-renderiza pro estado logado (com ou sem Pro)
         if (isPro()) { $("#pwMsg").textContent = "Pro ativo. Aproveite!"; $("#pwMsg").className = "pw-msg ok"; setTimeout(closePaywall, 900); }
         else { $("#pwMsg").textContent = "Conta pronta. O Pro ainda não está liberado nela."; $("#pwMsg").className = "pw-msg ok"; }
@@ -2794,7 +2862,12 @@
   $("#themeOverlay").addEventListener("click", (e) => { if (e.target === $("#themeOverlay")) closeThemeModal(); });
   // upsell
   $("#upsellClose").addEventListener("click", () => $("#upsellOverlay").classList.remove("open"));
-  function goCheckout() { const u = checkoutUrl(); if (u) location.href = u; }
+  function goCheckout() {
+    const u = checkoutUrl();
+    if (!u) return;
+    medir("checkout_iniciado", { plano: "pro", valor: 14.9 });
+    location.href = u;
+  }
   $("#pwSubscribe").addEventListener("click", goCheckout);
   $("#pwSubscribeTrial").addEventListener("click", goCheckout);
   $("#upsellCta").addEventListener("click", openPaywall);
@@ -2830,6 +2903,8 @@
   // auth: sincroniza a sessão no boot (não bloqueia o boot) e ao voltar pra aba.
   syncAuth();
   document.addEventListener("visibilitychange", function () { if (!document.hidden) syncAuth(); });
+  // medição de anúncio: carrega em segundo plano e nunca segura o boot.
+  carregarMedicao();
 
   // sync: ao voltar pra aba, puxa o que outro aparelho gravou (throttle de 15s pra não
   // martelar o servidor a cada alt-tab). Ao sair/esconder, manda o que estiver pendente.

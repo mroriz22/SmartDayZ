@@ -41,6 +41,7 @@ export function SiteNav({ base = "" }: { base?: string }) {
           </Link>
           <BotaoLink
             href="/quiz"
+            medir
             className="!px-3.5 !py-2 !text-sm whitespace-nowrap"
           >
             <span className="sm:hidden">Começar</span>
@@ -70,7 +71,9 @@ export function Hero() {
             de IA para planejar sua rotina — com a decisão final sempre sua.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <BotaoLink href="/quiz">Começar a organizar</BotaoLink>
+            <BotaoLink href="/quiz" medir>
+              Começar a organizar
+            </BotaoLink>
             <BotaoLink href="#como-funciona" variante="secundario">
               Ver como funciona
             </BotaoLink>
