@@ -14,7 +14,7 @@ export default function PrivacidadePage() {
   return (
     <PaginaLegal
       titulo="Política de privacidade"
-      atualizado="4 de outubro de 2026"
+      atualizado="17 de outubro de 2026"
     >
       <section>
         <p>
