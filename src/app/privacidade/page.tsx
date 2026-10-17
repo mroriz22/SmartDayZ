@@ -188,6 +188,16 @@ export default function PrivacidadePage() {
           navegador ou com um bloqueador de anúncios, sem perder nada do app.
         </p>
         <p>
+          Um contador nosso, que não é da Meta nem do Google, registra por quais
+          páginas públicas e etapas do cadastro a visita passou, quanto tempo
+          ficou em cada uma e se apareceu algum erro na tela. Ele usa um número
+          aleatório guardado num cookie, não guarda o seu IP e não lê o que você
+          digita: do formulário, só o nome do campo (por exemplo,
+          &quot;e-mail&quot;). Serve para descobrirmos em que ponto a página
+          confunde e quem desiste, e fica no painel interno da Lab2AppZ. Dentro
+          do app ele também não recebe as telas que você abre.
+        </p>
+        <p>
           Um cookie nosso guarda, por 90 dias, só de onde veio a sua primeira
           visita (por exemplo, um link do Instagram ou uma busca no Google).
           Quando você cria a conta, essa informação e a resposta opcional de

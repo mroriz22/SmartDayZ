@@ -1379,16 +1379,28 @@
     }
   }
 
-  // ---------- medição de anúncio (Meta e Google) ----------
+  // ---------- medição de anúncio (Meta, Google e jornada do Lab2AppZ) ----------
   // Cópia pequena de src/lib/medicao.ts: a agenda é HTML estático e não passa pelo React.
   // Aqui dentro só saem dois avisos: conta criada (cadastro) e clique em assinar
   // (checkout_iniciado). Nenhuma visita de tela e nenhum conteúdo da agenda: é promessa
   // da Política de Privacidade. Sem as variáveis no servidor, /api/medicao devolve vazio
   // e nenhum script é carregado. Medição nunca pode quebrar a agenda: tudo em try/catch.
+  // O contador de jornada do Lab2AppZ entra com /app no data-ignorar: sozinho ele não
+  // manda nada daqui, só o cadastro (começo, erro e conta criada) e o clique em assinar.
   const MEDICAO = {
-    cadastro: { meta: "CompleteRegistration", metaPadrao: true, google: "sign_up" },
-    checkout_iniciado: { meta: "InitiateCheckout", metaPadrao: true, google: "begin_checkout" },
+    cadastro: { meta: "CompleteRegistration", metaPadrao: true, google: "sign_up", jornada: "cadastro" },
+    checkout_iniciado: { meta: "InitiateCheckout", metaPadrao: true, google: "begin_checkout", jornada: "checkout" },
   };
+  // Fila até o contador chegar, igual à jornada() de src/lib/medicao.ts.
+  function jornada() {
+    try {
+      if (!window.lab2j) {
+        const fila = function () { (fila.q = fila.q || []).push([].slice.call(arguments)); };
+        window.lab2j = fila;
+      }
+      window.lab2j.apply(null, arguments);
+    } catch (e) { /* no-op */ }
+  }
   let conversaoCadastroGoogle = "";
   async function carregarMedicao() {
     if (location.protocol === "file:") return;
@@ -1421,12 +1433,21 @@
         window.gtag("config", tag, { send_page_view: false });
         conversaoCadastroGoogle = String((c && c.conversaoCadastroGoogle) || "");
       }
+      const j = c && c.jornada;
+      if (j && j.src === "https://lab2appz.roriz.tech/j.js" && !document.getElementById("jornada-lab2appz")) {
+        const s = document.createElement("script");
+        s.id = "jornada-lab2appz"; s.async = true; s.src = j.src;
+        s.setAttribute("data-site", String(j.site || ""));
+        s.setAttribute("data-ignorar", String(j.ignorar || ""));
+        document.head.appendChild(s);
+      }
     } catch (e) { /* sem medição, a agenda segue igual */ }
   }
   function medir(evento, dados) {
     const nomes = MEDICAO[evento];
     if (!nomes) return;
     dados = dados || {};
+    jornada("evento", nomes.jornada, dados.valor !== undefined ? { valor: dados.valor } : {});
     try {
       if (window.fbq) {
         const p = {};
@@ -2240,6 +2261,7 @@
     if (!email) { $("#pwEmail").focus(); return; }
     if (!pass) { $("#pwPass").focus(); return; }
     if (pwMode === "signup" && pass.length < 8) {
+      jornada("erro", "Cadastro: A senha precisa de pelo menos 8 caracteres.");
       $("#pwMsg").textContent = "A senha precisa de pelo menos 8 caracteres.";
       $("#pwMsg").className = "pw-msg err";
       $("#pwPass").focus();
@@ -2251,15 +2273,21 @@
     try {
       const r = pwMode === "signin" ? await signIn(email, pass) : await signUp(email, pass);
       if (r.ok) {
-        if (pwMode === "signup") medir("cadastro"); // só conta criada de verdade
+        if (pwMode === "signup") {
+          medir("cadastro"); // só conta criada de verdade
+          // liga a jornada à conta: só o id interno, sem nome nem e-mail
+          if (authUser && authUser.id) jornada("conta", authUser.id);
+        }
         openPaywall(); // re-renderiza pro estado logado (com ou sem Pro)
         if (isPro()) { $("#pwMsg").textContent = "Pro ativo. Aproveite!"; $("#pwMsg").className = "pw-msg ok"; setTimeout(closePaywall, 900); }
         else { $("#pwMsg").textContent = "Conta pronta. O Pro ainda não está liberado nela."; $("#pwMsg").className = "pw-msg ok"; }
       } else {
         $("#pwMsg").textContent = r.error; $("#pwMsg").className = "pw-msg err";
+        if (pwMode === "signup") jornada("erro", "Cadastro: " + r.error);
       }
     } catch (e) {
       $("#pwMsg").textContent = "Falha de conexão. Tente de novo."; $("#pwMsg").className = "pw-msg err";
+      if (pwMode === "signup") jornada("erro", "Cadastro: Falha de conexão. Tente de novo.");
     }
     btn.disabled = false; btn.textContent = orig;
   }
@@ -2877,6 +2905,15 @@
   $("#loginBtn").addEventListener("click", openPaywall);
   $("#pwClose").addEventListener("click", closePaywall);
   $("#pwAuthBtn").addEventListener("click", pwAuth);
+  // Primeiro toque num campo do cadastro: degrau "começou o cadastro" da jornada.
+  let cadastroComecou = false;
+  for (const id of ["#pwEmail", "#pwPass"]) {
+    $(id).addEventListener("focus", () => {
+      if (pwMode !== "signup" || cadastroComecou) return;
+      cadastroComecou = true;
+      jornada("evento", "cadastro_inicio");
+    });
+  }
   $("#pwToggleMode").addEventListener("click", () => setAuthMode(pwMode === "signin" ? "signup" : "signin"));
   $("#pwSignOut").addEventListener("click", pwSignOut);
   $("#pwSignOut2").addEventListener("click", pwSignOut);

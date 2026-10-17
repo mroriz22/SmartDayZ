@@ -3,11 +3,12 @@
 import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef } from "react";
-import { visitaMedicao } from "@/lib/medicao";
+import { CONTADOR_JORNADA, SITE_JORNADA, TELAS_INTERNAS, visitaMedicao } from "@/lib/medicao";
 
 /**
  * Carrega os contadores de anúncio (pixel do Meta e tag do Google) e avisa os dois
- * quando a pessoa muda de tela.
+ * quando a pessoa muda de tela. Carrega também o contador de jornada do Lab2AppZ, que é
+ * nosso e não depende das variáveis do Meta e do Google.
  *
  * Nada é carregado sem as variáveis preenchidas: enquanto o pixel não existir, este
  * componente não injeta script nenhum e o site fica exatamente como está hoje. É de
@@ -32,9 +33,6 @@ import { visitaMedicao } from "@/lib/medicao";
 const PIXEL_META = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 const TAG_GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_TAG_ID;
 const CONVERSAO_CADASTRO_GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSAO_CADASTRO ?? "";
-
-/** Começos de caminho que são a área logada, não a jornada de compra. */
-const TELAS_INTERNAS = ["/app", "/dashboard", "/paywall"];
 
 function ehTelaInterna(pathname: string) {
   return TELAS_INTERNAS.some((inicio) => pathname === inicio || pathname.startsWith(`${inicio}/`));
@@ -62,6 +60,23 @@ function VisitaEmCadaTela() {
 }
 
 export function Medicao() {
+  return (
+    <>
+      {CONTADOR_JORNADA ? (
+        <Script
+          id="jornada-lab2appz"
+          strategy="afterInteractive"
+          src={CONTADOR_JORNADA}
+          data-site={SITE_JORNADA}
+          data-ignorar={TELAS_INTERNAS.join(",")}
+        />
+      ) : null}
+      <AnuncioMetaGoogle />
+    </>
+  );
+}
+
+function AnuncioMetaGoogle() {
   if (!PIXEL_META && !TAG_GOOGLE) return null;
 
   return (
