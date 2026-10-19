@@ -14,7 +14,7 @@ export default function PrivacidadePage() {
   return (
     <PaginaLegal
       titulo="Política de privacidade"
-      atualizado="4 de outubro de 2026"
+      atualizado="17 de outubro de 2026"
     >
       <section>
         <p>
@@ -186,6 +186,16 @@ export default function PrivacidadePage() {
           a Meta e o Google só ficam sabendo que uma conta foi criada ou que
           alguém clicou para assinar. Você pode bloquear essa medição no seu
           navegador ou com um bloqueador de anúncios, sem perder nada do app.
+        </p>
+        <p>
+          Um contador nosso, que não é da Meta nem do Google, registra por quais
+          páginas públicas e etapas do cadastro a visita passou, quanto tempo
+          ficou em cada uma e se apareceu algum erro na tela. Ele usa um número
+          aleatório guardado num cookie, não guarda o seu IP e não lê o que você
+          digita: do formulário, só o nome do campo (por exemplo,
+          &quot;e-mail&quot;). Serve para descobrirmos em que ponto a página
+          confunde e quem desiste, e fica no painel interno da Lab2AppZ. Dentro
+          do app ele também não recebe as telas que você abre.
         </p>
         <p>
           Um cookie nosso guarda, por 90 dias, só de onde veio a sua primeira

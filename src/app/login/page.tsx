@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { lerRespostas } from "@/lib/product/onboarding";
 import { authClient } from "@/lib/auth-client";
-import { eventoMedicao } from "@/lib/medicao";
+import { eventoMedicao, jornada } from "@/lib/medicao";
 import { COMO_CONHECEU, guardarResposta } from "@/lib/origem";
 
 /** Traduz o recado técnico do Better Auth pra uma frase que a pessoa entende. */
@@ -33,6 +33,16 @@ export default function LoginPage() {
   const [comoConheceu, setComoConheceu] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const comecou = useRef(false);
+
+  // Primeiro toque num campo do cadastro: é o degrau "começou o cadastro" da jornada no
+  // Lab2AppZ. Quem abre o formulário e não toca em nada desistiu antes dele; quem toca e
+  // não termina, desistiu nele (e a jornada mostra em qual campo). Login não conta.
+  function aoComecar() {
+    if (mode !== "signup" || comecou.current) return;
+    comecou.current = true;
+    jornada("evento", "cadastro_inicio");
+  }
   const id = useId();
 
   // Vindo do onboarding (/quiz): abre no cadastro e reaproveita nome e e-mail
@@ -61,6 +71,9 @@ export default function LoginPage() {
         // Conversão que o anúncio persegue. Fica depois do sucesso: conta que falhou não
         // é conversão, e contar errado ensina o anúncio a buscar a pessoa errada.
         eventoMedicao("cadastro");
+        // Liga esta jornada à conta, para a compra avisada pelo servidor cair no anúncio
+        // certo. É só o id interno, sem nome nem e-mail.
+        if (res.data?.user?.id) jornada("conta", res.data.user.id);
       } else {
         const res = await authClient.signIn.email({ email, password });
         if (res.error) throw new Error(res.error.message ?? "login failed");
@@ -68,7 +81,10 @@ export default function LoginPage() {
       router.push("/app");
       router.refresh();
     } catch (err) {
-      setError(recado(err instanceof Error ? err.message : String(err), mode));
+      const frase = recado(err instanceof Error ? err.message : String(err), mode);
+      setError(frase);
+      // A frase que a pessoa leu, nunca o e-mail: é o que aparece em "Erros que apareceram".
+      if (mode === "signup") jornada("erro", `Cadastro: ${frase}`);
     } finally {
       setLoading(false);
     }
@@ -94,7 +110,7 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4" noValidate={false}>
+      <form onSubmit={onSubmit} onFocus={aoComecar} className="space-y-4" noValidate={false}>
         {mode === "signup" && (
           <div className="space-y-1.5">
             <label className={rotulo} htmlFor={`${id}-nome`}>
