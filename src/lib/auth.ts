@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { analytics } from "@/factory/analytics";
 import { startTrial } from "@/factory/billing";
+import { avisarBoasVindas, cadastroPeloSite, whatsappDoCadastro } from "@/factory/boas-vindas";
 import { db, schema } from "./db";
 import { origemDoCabecalho } from "./origem";
 
@@ -25,6 +26,7 @@ export const auth = betterAuth({
     user: {
       create: {
         after: async (user, context) => {
+          let fimDoTeste: Date | null = null;
           try {
             const ent = await startTrial(user.id);
             // De onde a pessoa veio (cookie de primeiro toque, lib/origem.ts), junto com a
@@ -35,10 +37,23 @@ export const auth = betterAuth({
             );
             void analytics.signedUp(user.id, { source: "signup", ...(origem ? { origem } : {}) });
             if (ent?.trialEndsAt) {
+              fimDoTeste = ent.trialEndsAt;
               void analytics.trialStarted(user.id, ent.trialEndsAt);
             }
           } catch {
             // não bloqueia signup se trial falhar
+          }
+          // Quem criou a conta no site entra nas boas-vindas do Lab2AppZ (e-mail com a marca e
+          // fila do WhatsApp). O WhatsApp vem junto do cadastro e só vai pra lá.
+          if (cadastroPeloSite(context)) {
+            void avisarBoasVindas({
+              userId: user.id,
+              nome: user.name,
+              email: user.email,
+              whatsapp: whatsappDoCadastro(context),
+              em: user.createdAt,
+              testeAte: fimDoTeste,
+            });
           }
         },
       },

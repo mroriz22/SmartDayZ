@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { lerRespostas } from "@/lib/product/onboarding";
+import { ERRO_WHATSAPP, whatsappValido } from "@/factory/whatsapp";
 import { authClient } from "@/lib/auth-client";
 import { eventoMedicao, jornada } from "@/lib/medicao";
 import { COMO_CONHECEU, guardarResposta } from "@/lib/origem";
@@ -28,6 +29,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [verSenha, setVerSenha] = useState(false);
   const [name, setName] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   // Opcional de propósito: não trava o cadastro. É o que mostra se grupo, Instagram e busca
   // estão trazendo gente, porque esses caminhos não deixam rastro de anúncio.
   const [comoConheceu, setComoConheceu] = useState("");
@@ -61,12 +63,24 @@ export default function LoginPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (mode === "signup" && !whatsappValido(whatsapp)) {
+      setError(ERRO_WHATSAPP);
+      jornada("erro", `Cadastro: ${ERRO_WHATSAPP}`);
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signup") {
         // Vai no cookie de origem (lib/origem.ts), que o servidor lê quando a conta nasce.
         guardarResposta(comoConheceu);
-        const res = await authClient.signUp.email({ email, password, name: name || email.split("@")[0] });
+        // O WhatsApp vai junto do cadastro e o servidor repassa só pro Lab2AppZ (boas-vindas):
+        // não é campo da conta, por isso o tipo do signUp não conhece.
+        const res = await authClient.signUp.email({
+          email,
+          password,
+          name: name || email.split("@")[0],
+          whatsapp,
+        } as Parameters<typeof authClient.signUp.email>[0]);
         if (res.error) throw new Error(res.error.message ?? "signup failed");
         // Conversão que o anúncio persegue. Fica depois do sucesso: conta que falhou não
         // é conversão, e contar errado ensina o anúncio a buscar a pessoa errada.
@@ -140,6 +154,29 @@ export default function LoginPage() {
             autoComplete="email"
           />
         </div>
+
+        {mode === "signup" && (
+          <div className="space-y-1.5">
+            <label className={rotulo} htmlFor={`${id}-whatsapp`}>
+              WhatsApp
+            </label>
+            <input
+              id={`${id}-whatsapp`}
+              className={campo}
+              type="tel"
+              inputMode="tel"
+              required
+              placeholder="(11) 98765-4321"
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(e.target.value)}
+              autoComplete="tel"
+              aria-describedby={`${id}-whatsapp-dica`}
+            />
+            <p id={`${id}-whatsapp-dica`} className="text-xs text-slate">
+              Pra gente te mandar uma mensagem e ajudar no começo do teste.
+            </p>
+          </div>
+        )}
 
         <div className="space-y-1.5">
           <label className={rotulo} htmlFor={`${id}-senha`}>

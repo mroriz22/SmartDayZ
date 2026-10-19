@@ -14,7 +14,7 @@ export default function PrivacidadePage() {
   return (
     <PaginaLegal
       titulo="Política de privacidade"
-      atualizado="17 de outubro de 2026"
+      atualizado="19 de outubro de 2026"
     >
       <section>
         <p>
@@ -32,6 +32,11 @@ export default function PrivacidadePage() {
             <strong>Conta:</strong> nome, e-mail, senha protegida por
             criptografia e os registros de sessão (data de acesso, endereço IP e
             navegador).
+          </li>
+          <li>
+            <strong>WhatsApp:</strong> pedido no cadastro só pra mandarmos uma
+            mensagem de boas-vindas e ajudar no começo do teste. Não entra em
+            lista de propaganda.
           </li>
           <li>
             <strong>Uso do app:</strong> tarefas, agendas, pico de energia,
@@ -115,7 +120,12 @@ export default function PrivacidadePage() {
           </li>
           <li>
             <strong>E-mail:</strong> o serviço que envia mensagens de acesso,
-            avisos da conta e respostas de suporte.
+            avisos da conta, boas-vindas e respostas de suporte.
+          </li>
+          <li>
+            <strong>Painel interno da Lab2AppZ:</strong> recebe seu nome, e-mail
+            e WhatsApp no cadastro, pra mandarmos o e-mail e a mensagem de
+            boas-vindas. Não recebe suas tarefas nem sua agenda.
           </li>
           <li>
             <strong>Pagamento:</strong> a Quack (AmploPay), que processa a
