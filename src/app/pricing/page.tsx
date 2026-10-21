@@ -51,29 +51,32 @@ export default function PricingPage() {
           ))}
         </ul>
 
-        {url ? (
-          <CtaMedido
-            href={url}
-            evento="checkout_iniciado"
-            dados={{ plano: "pro", valor: 14.9 }}
-            className="mt-6 inline-flex w-full justify-center rounded-btn bg-signal px-4 py-3 text-sm font-medium text-white hover:opacity-90"
-          >
-            Assinar o Pro
-          </CtaMedido>
-        ) : (
-          /* Sem link de checkout configurado: o visitante ainda tem um caminho,
-             em vez de ver um recado de configuração. */
-          <CtaMedido
-            href="/login"
-            className="mt-6 inline-flex w-full justify-center rounded-btn bg-signal px-4 py-3 text-sm font-medium text-white hover:opacity-90"
-          >
-            Começar o teste de {factoryConfig.trialDays} dias
-          </CtaMedido>
-        )}
+        {/* O teste grátis é sempre o caminho principal, como a página promete. Assinar
+            direto fica como segunda opção, só quando o link do checkout existe. */}
+        <CtaMedido
+          href="/login"
+          className="mt-6 inline-flex w-full justify-center rounded-btn bg-signal px-4 py-3 text-sm font-medium text-white hover:opacity-90"
+        >
+          Começar o teste de {factoryConfig.trialDays} dias
+        </CtaMedido>
 
         <p className="mt-3 text-center text-xs text-slate">
           Cancele quando quiser, direto na sua conta.
         </p>
+
+        {url ? (
+          <p className="mt-4 border-t border-hairline pt-4 text-center text-sm text-slate">
+            Prefere assinar já?{" "}
+            <CtaMedido
+              href={url}
+              evento="checkout_iniciado"
+              dados={{ plano: "pro", valor: 14.9 }}
+              className="font-medium text-ink underline hover:opacity-80"
+            >
+              Assinar o Pro por R$14,90/mês
+            </CtaMedido>
+          </p>
+        ) : null}
       </div>
 
       <p className="text-sm text-slate">
