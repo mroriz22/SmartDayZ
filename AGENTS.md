@@ -66,3 +66,7 @@ import {
 ## Next.js
 
 Leia docs em `node_modules/next/dist/docs/` se algo de App Router divergir do treino.
+
+## Componentes de interação (ui-sdk)
+
+A pergunta frequente da landing (`src/components/product/landing/secoes.tsx`, `Duvidas`) usa o Accordion do `@ui-sdk/react` (sem estilo; a aparência continua nas classes do app). Antes de criar ou mexer em janela, menu, lista que abre, abas, acordeão ou dica, leia `node_modules/@ui-sdk/react/docs/llms.txt`. Nada abre por cima de um Dialog via `createPortal` para `document.body` nem `fixed` com z-index: o resto da página fica inerte enquanto a janela está aberta.

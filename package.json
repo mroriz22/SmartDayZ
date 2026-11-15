@@ -17,6 +17,8 @@
     "factory:new": "bash scripts/new-saas.sh"
   },
   "dependencies": {
+    "@ui-sdk/core": "0.1.0-beta.1",
+    "@ui-sdk/react": "0.1.0-beta.1",
     "better-auth": "^1.6.23",
     "drizzle-orm": "^0.45.2",
     "ioredis": "^5.11.1",
