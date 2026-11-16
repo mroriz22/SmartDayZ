@@ -1,3 +1,10 @@
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "@ui-sdk/react/accordion";
 import { BotaoLink, Check, Eyebrow, Logo, SectionTitle } from "./lp-ui";
 
 /* ───────── Recursos ───────── */
@@ -171,20 +178,29 @@ export function Duvidas() {
         <h2 className="mt-3 text-[32px] font-extrabold tracking-[-0.025em] text-navy sm:text-[36px]">
           Perguntas frequentes
         </h2>
-        <div className="mt-8 border-t border-line">
-          {DUVIDAS.map((d, i) => (
-            <details key={d.p} open={i === 0} className="group border-b border-line">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[17px] font-semibold text-navy hover:text-orange-text focus-visible:outline-2 focus-visible:outline-navy [&::-webkit-details-marker]:hidden">
-                {d.p}
-                <span aria-hidden className="text-xl font-bold leading-none text-orange">
-                  <span className="group-open:hidden">+</span>
-                  <span className="hidden group-open:inline">−</span>
-                </span>
-              </summary>
-              <p className="pb-5 text-[15px] leading-relaxed text-body">{d.r}</p>
-            </details>
+        <Accordion
+          multiple
+          hiddenUntilFound
+          defaultValue={[DUVIDAS[0].p]}
+          className="mt-8 border-t border-line"
+        >
+          {DUVIDAS.map((d) => (
+            <AccordionItem key={d.p} value={d.p} className="group border-b border-line">
+              <AccordionHeader>
+                <AccordionTrigger className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left text-[17px] font-semibold text-navy hover:text-orange-text focus-visible:outline-2 focus-visible:outline-navy">
+                  {d.p}
+                  <span aria-hidden className="text-xl font-bold leading-none text-orange">
+                    <span className="group-data-open:hidden">+</span>
+                    <span className="hidden group-data-open:inline">−</span>
+                  </span>
+                </AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>
+                <p className="pb-5 text-[15px] leading-relaxed text-body">{d.r}</p>
+              </AccordionPanel>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       </div>
     </section>
   );

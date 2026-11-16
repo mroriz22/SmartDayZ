@@ -7,6 +7,12 @@ settings:
 importers:
   .:
     dependencies:
+      "@ui-sdk/core":
+        specifier: 0.1.0-beta.1
+        version: 0.1.0-beta.1
+      "@ui-sdk/react":
+        specifier: 0.1.0-beta.1
+        version: 0.1.0-beta.1(@types/react@19.2.17)(@ui-sdk/core@0.1.0-beta.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       better-auth:
         specifier: ^1.6.23
         version: 1.6.23(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(kysely@0.29.3)(postgres@3.4.9))(next@16.2.10(@babel/core@7.29.7(supports-color@7.2.0))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1803,6 +1809,20 @@ packages:
         integrity: sha512-UexrHGnGTpbuQHct2ExOc2ZcFbGUS9FOesCxxqdBGcpI1BxYu/LZ6U8Aq6/72XtF/qRBk9nhuGHFJIXXMhPMdw==,
       }
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
+
+  "@ui-sdk/core@0.1.0-beta.1":
+    resolution: {integrity: sha512-sWsZW8RN6Gviir7REQYuDIafm9hierHQE31OJ+2g+1Pp3lDVKp/dk0+0dxFvqOQRmBveRvlE9FiARgNlQ9dMFw==}
+
+  "@ui-sdk/react@0.1.0-beta.1":
+    resolution: {integrity: sha512-7wcUsZI+WoG2uo3N+PHrWntk97qI9ez2cUrHV9H507FiL118Pi4tuhWUCMDtWwEUCNQLybpBm1QRLkEXVOPAUg==}
+    peerDependencies:
+      "@types/react": ">=19.2.10"
+      "@ui-sdk/core": ^0.1.0-beta.1
+      react: ">=19"
+      react-dom: ">=19"
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
 
   "@unrs/resolver-binding-android-arm-eabi@1.12.2":
     resolution:
@@ -5300,6 +5320,16 @@ snapshots:
     dependencies:
       "@typescript-eslint/types": 8.63.0
       eslint-visitor-keys: 5.0.1
+
+  "@ui-sdk/core@0.1.0-beta.1": {}
+
+  "@ui-sdk/react@0.1.0-beta.1(@types/react@19.2.17)(@ui-sdk/core@0.1.0-beta.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)":
+    dependencies:
+      "@ui-sdk/core": 0.1.0-beta.1
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+    optionalDependencies:
+      "@types/react": 19.2.17
 
   "@unrs/resolver-binding-android-arm-eabi@1.12.2":
     optional: true
